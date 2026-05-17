@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+/*
+  Design tokens sourced from 02-VISUAL-DESIGN-SYSTEM.md.
+  Anything that ships to the DOM should reference these — never inline a hex.
+*/
+
+@theme {
+  /* Space & sky */
+  --color-void: #000308;
+  --color-deep-space: #020b1a;
+  --color-nebula-blue: #0a1628;
+  --color-star-white: #e8f4ff;
+  --color-plasma-cyan: #00d4ff;
+  --color-engine-orange: #ff6b2b;
+  --color-gold-accent: #ffb800;
+
+  /* Pixel world */
+  --color-pixel-sky: #1a1a2e;
+  --color-pixel-ground: #2d5a1b;
+  --color-pixel-accent: #ff6b6b;
+  --color-pixel-star: #ffe66d;
+  --color-pixel-shadow: #0d0d0d;
+
+  /* Terminal */
+  --color-terminal-bg: #0d0d0d;
+  --color-terminal-green: #00ff41;
+  --color-terminal-bright: #39ff14;
+  --color-terminal-dim: #003b00;
+  --color-terminal-shadow: #0a2700;
+
+  /* Grassland */
+  --color-golden-sky: #ff9a3c;
+  --color-golden-horizon: #ffb877;
+  --color-warm-grass: #4a7c59;
+  --color-earth-soil: #6b4423;
+  --color-peace-white: #fff8f0;
+
+  /* Spacing scale */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+
+  /* Easing — keep in sync with src/lib/easing.ts */
+  --ease-out-soft: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-in-soft: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  --ease-in-out-soft: cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+@layer base {
+  html,
+  body {
+    background: var(--color-void);
+    color: var(--color-star-white);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--color-plasma-cyan);
+    outline-offset: 2px;
+  }
+
+  /* Honor prefers-reduced-motion — see 02-VISUAL-DESIGN-SYSTEM.md §08 */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  /*
+    Scroll container — the entire experience is one continuous scroll.
+    Total height is 460vh: each scene reserves a band of vertical space,
+    and per-scene scroll progress is derived from the band.
+  */
+  .scene-band {
+    position: relative;
+    width: 100%;
+  }
+
+  /* Fixed full-viewport canvas/overlay shared across scenes */
+  .fixed-stage {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+  }
+}
