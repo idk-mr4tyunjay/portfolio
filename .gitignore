@@ -48,3 +48,5 @@ claude.md
 02-*
 03-*
 04-*
+.claude/
+firebase-debug.log

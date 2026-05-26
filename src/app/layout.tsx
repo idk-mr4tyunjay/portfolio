@@ -32,7 +32,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={fontVariables}>
-      <body className="bg-[var(--color-void)] text-[var(--color-star-white)] font-[var(--font-inter)] antialiased">
+      <body
+        className="antialiased"
+        style={{ fontFamily: "var(--font-inter)" }}
+      >
         {children}
       </body>
     </html>

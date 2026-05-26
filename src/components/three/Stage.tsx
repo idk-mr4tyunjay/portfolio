@@ -7,32 +7,30 @@ import { Effects } from "./Effects";
 import { SceneSwitcher } from "./SceneSwitcher";
 
 /*
-  Single shared R3F canvas. Pinned full-viewport, behind all DOM overlays.
-  Scene contents swap based on active scroll band — there's no per-scene Canvas.
+  Shared R3F canvas. Always renders at the full size of its parent.
+  Framing/clipping (Hero viewport-to-fullscreen expansion etc.) is owned
+  by the parent — see Experience.tsx — so this stays scene-agnostic.
 
-  Why one canvas: lets us cross-fade between scenes via shared render targets
-  (Portal 1 / Portal 2 read the previous scene's output through a postprocess pass).
+  Camera defaults: FOV 50, position (0, 0, 3) per SPEC.md §4. Scenes
+  override z (and any other camera params) as needed via useThree.
 */
 export function Stage() {
   const reducedMotion = useScrollStore((s) => s.reducedMotion);
 
   return (
-    <div className="fixed-stage z-0 pointer-events-none">
-      <Canvas
-        dpr={[1, 2]}
-        gl={{
-          antialias: true,
-          alpha: false,
-          powerPreference: "high-performance",
-        }}
-        camera={{ position: [0, 0, 5], fov: 60 }}
-        className="!pointer-events-auto"
-      >
-        <Suspense fallback={null}>
-          <SceneSwitcher />
-          {!reducedMotion && <Effects />}
-        </Suspense>
-      </Canvas>
-    </div>
+    <Canvas
+      dpr={[1, 2]}
+      gl={{
+        antialias: true,
+        alpha: false,
+        powerPreference: "high-performance",
+      }}
+      camera={{ position: [0, 0, 3], fov: 50 }}
+    >
+      <Suspense fallback={null}>
+        <SceneSwitcher />
+        {!reducedMotion && <Effects />}
+      </Suspense>
+    </Canvas>
   );
 }
