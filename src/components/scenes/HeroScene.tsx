@@ -120,11 +120,14 @@ export function HeroScene() {
       <Starfield />
 
       {/*
-        Astronaut is hidden for now — we'll bring it back next to Earth
-        once the Earth's framing is dialled in.  Keeping the Astronaut
-        function below intact so we can re-mount it without re-writing.
+        Astronaut drifts up into frame as the Hero scrolls — see <Astronaut/>
+        for the scroll-driven entry + slow tumble. It rides up at a fixed Z in
+        front of the Earth so it clears the limb cleanly instead of clipping
+        through the planet.
       */}
-      {/* <Suspense fallback={null}><Astronaut /></Suspense> */}
+      <Suspense fallback={null}>
+        <Astronaut />
+      </Suspense>
 
       <Suspense fallback={null}>
         <Earth />
@@ -198,8 +201,15 @@ const MODEL_PATH = "/models/walking_astronaut_visor_optimized.glb";
 
 useGLTF.preload(MODEL_PATH, false, true);
 
+// Hero-local progress window over which the astronaut completes its drift-in.
+// Starts ~immediately on scroll; finishes before the Hero band hands off to
+// the portal, so the whole entry lives inside Scene 01.
+const ENTRY_START = 0.0;
+const ENTRY_END = 0.85;
+
 function Astronaut() {
   const group = useRef<THREE.Group>(null);
+  const outerRef = useRef<THREE.Group>(null);
   const gltf = useGLTF(MODEL_PATH, false, true);
 
   /*
@@ -216,31 +226,64 @@ function Astronaut() {
   const { actions } = useAnimations(gltf.animations, group);
 
   const ast = useControls("Astronaut", {
-    position: {
-      value: { x: 0, y: 0, z: 0 },
-      step: 0.05,
-    },
-    rotationDeg: {
-      value: { x: 0, y: 0, z: 0 },
-      step: 5,
-      label: "rotation (°)",
-    },
     targetHeight: {
-      value: 2.5,
+      value: 2.0,
       min: 0.3,
       max: 10,
       step: 0.1,
       label: "height (units)",
     },
     anchorMode: {
-      value: "head",
+      // "bbox center" makes the suit tumble around its middle (calm EVA roll);
+      // "head" pivots at the helmet (more top-heavy spin).
+      value: "bbox center",
       options: ["head", "bbox center"],
-      label: "anchor",
+      label: "tumble pivot",
     },
     animation: {
-      value: "wave",
+      // "floating" suits a weightless drift (was "wave" while tuning pose).
+      value: "floating",
       options: ["floating", "idle", "wave", "moon_walk", "none"],
       label: "animation",
+    },
+    depthZ: {
+      // Fixed Z, kept in front of the Earth's near limb so the suit occludes
+      // the planet during its rise rather than clipping through the surface.
+      value: 0.5,
+      min: -2,
+      max: 3,
+      step: 0.05,
+      label: "depth (z)",
+    },
+    startY: {
+      // Below the frame at scroll = 0.
+      value: -4.5,
+      min: -12,
+      max: 0,
+      step: 0.1,
+      label: "entry: start Y",
+    },
+    endY: {
+      // Resting height — sits in the black just above Earth's horizon limb.
+      value: 0.8,
+      min: -3,
+      max: 4,
+      step: 0.1,
+      label: "entry: rest Y",
+    },
+    yawSpeed: {
+      value: 0.2,
+      min: 0,
+      max: 1.5,
+      step: 0.01,
+      label: "tumble: yaw/s",
+    },
+    wobble: {
+      value: 0.12,
+      min: 0,
+      max: 0.6,
+      step: 0.01,
+      label: "tumble: wobble",
     },
   });
 
@@ -291,22 +334,45 @@ function Astronaut() {
     };
   }, [actions, ast.animation]);
 
-  const rotation: [number, number, number] = [
-    THREE.MathUtils.degToRad(ast.rotationDeg.x),
-    THREE.MathUtils.degToRad(ast.rotationDeg.y),
-    THREE.MathUtils.degToRad(ast.rotationDeg.z),
-  ];
+  /*
+    Scroll-driven entry. The astronaut starts below the frame and drifts up
+    into view across the Hero band — synced with the camera dolly that pushes
+    Earth away (see HeroScene's useFrame). On top of the vertical drift it
+    tumbles slowly, like an untethered EVA. Reading scroll imperatively from
+    the store so this loop doesn't trigger React re-renders.
+    Reduced-motion snaps to the resting pose with no tumble.
+  */
+  useFrame((state) => {
+    const g = outerRef.current;
+    if (!g) return;
+
+    const { progress, reducedMotion } = useScrollStore.getState();
+    const local = sceneProgress(progress, "hero");
+    const entry = THREE.MathUtils.clamp(
+      (local - ENTRY_START) / (ENTRY_END - ENTRY_START),
+      0,
+      1,
+    );
+    const t = easeOutCubic(entry);
+
+    g.position.set(0, THREE.MathUtils.lerp(ast.startY, ast.endY, t), ast.depthZ);
+
+    if (reducedMotion) {
+      g.rotation.set(0, 0, 0);
+      return;
+    }
+
+    // Slow multi-axis tumble; the wobble axes are offset so it never repeats.
+    const e = state.clock.elapsedTime;
+    g.rotation.y = e * ast.yawSpeed;
+    g.rotation.z = Math.sin(e * 0.35) * ast.wobble;
+    g.rotation.x = Math.sin(e * 0.21) * ast.wobble * 0.5;
+  });
 
   return (
-    <group
-      position={[ast.position.x, ast.position.y, ast.position.z]}
-      rotation={rotation}
-    >
+    <group ref={outerRef}>
       <group scale={fitScale}>
-        <group
-          ref={group}
-          position={[-anchor.x, -anchor.y, -anchor.z]}
-        >
+        <group ref={group} position={[-anchor.x, -anchor.y, -anchor.z]}>
           <primitive object={clonedScene} />
         </group>
       </group>
