@@ -4,13 +4,17 @@ export function WorkList() {
   return (
     <section id="work" aria-label="Work" className="pb-20">
       <p
-        className="mb-1 text-xs"
-        style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}
+        className="fade-up mb-1 text-xs"
+        style={{
+          fontFamily: "var(--font-mono)",
+          color: "var(--color-fg-muted)",
+          animationDelay: "0.25s",
+        }}
       >
         work
       </p>
       <ul>
-        {PROJECTS.map((project) => {
+        {PROJECTS.map((project, index) => {
           const row = (
             <span
               className="block py-4"
@@ -49,7 +53,11 @@ export function WorkList() {
           );
 
           return (
-            <li key={project.name}>
+            <li
+              key={project.name}
+              className="fade-up"
+              style={{ animationDelay: `${0.3 + index * 0.06}s` }}
+            >
               {project.url ? (
                 <a
                   href={project.url}
