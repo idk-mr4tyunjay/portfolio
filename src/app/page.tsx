@@ -2,6 +2,7 @@ import { Nav } from "@/components/home/Nav";
 import { Hero } from "@/components/home/Hero";
 import { WorkList } from "@/components/home/WorkList";
 import { Footer } from "@/components/home/Footer";
+import { CommandPalette } from "@/components/home/CommandPalette";
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
         <WorkList />
       </main>
       <Footer />
+      <CommandPalette />
     </div>
   );
 }

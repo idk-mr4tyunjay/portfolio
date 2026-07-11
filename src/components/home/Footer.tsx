@@ -23,7 +23,8 @@ export function Footer() {
         style={{ color: "var(--color-accent)" }}
       >
         github
-      </a>
+      </a>{" "}
+      · <kbd style={{ color: "var(--color-fg-secondary)" }}>⌘K</kbd>
     </footer>
   );
 }
