@@ -1,87 +1,41 @@
 @import "tailwindcss";
 
 /*
-  Design tokens — SPEC.md §9.
+  Design tokens — SPEC.md §3.
   Anything that ships to the DOM references these — never inline a hex.
 */
 
 @theme {
-  /* Shared */
-  --color-deep-space: #03081f;
-  --color-star-white: #f4f6ff;
-  --color-plasma-cyan: #7cf6ff;
-  --color-warning-amber: #ffb14a;
-  --color-terminal-green: #00ff41;
-
-  /* Scene 01 — Hero (deep space) */
-  --color-hero-bg: #03081f;
-  --color-hero-accent: #5b8cff;
-  --color-hero-glow: #a8c5ff;
-
-  /* Scene 03 — Pixel Journey */
-  --color-pixel-sky: #8fb8e8;
-  --color-pixel-grass: #6fb359;
-  --color-pixel-ground: #9a6b3c;
-  --color-pixel-monument: #fff2c4;
-  --color-pixel-shadow: #2c1f1a;
-
-  /* Scene 04 — Projects */
-  --color-projects-bg: #0d1327;
-  --color-projects-card: rgba(13, 19, 39, 0.85);
-  --color-projects-border: rgba(124, 246, 255, 0.3);
-
-  /* Scene 05 — Landing (golden hour) */
-  --color-landing-sky-top: #1a2a4a;
-  --color-landing-sky-mid: #ff6a3d;
-  --color-landing-sky-bot: #ffd57a;
-  --color-landing-grass: #5d8f4e;
-
-  /* Spacing scale per SPEC.md §9 */
-  --spacing-1: 4px;
-  --spacing-2: 8px;
-  --spacing-3: 12px;
-  --spacing-4: 16px;
-  --spacing-6: 24px;
-  --spacing-8: 32px;
-  --spacing-12: 48px;
-  --spacing-16: 64px;
-  --spacing-24: 96px;
-  --spacing-32: 128px;
-
-  /* Easing — SPEC.md §9 */
-  --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
-  --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+  --color-bg: #0a0a0b;
+  --color-fg: #f2f2f4;
+  --color-fg-secondary: #8a8a90;
+  --color-fg-muted: #6b6b70;
+  --color-hairline: #1e1e20;
+  --color-accent: #7cf6ff;
+  --color-ok: #4ade80;
 }
 
 @layer base {
-  /*
-    Page chrome: light off-white background with dark text.
-    The 3D canvas paints its own background (deep space #03081f) inside
-    the framed viewport — the contrast between page and canvas IS the frame.
-  */
   html,
   body {
-    background: var(--color-star-white);
-    color: var(--color-deep-space);
+    background: var(--color-bg);
+    color: var(--color-fg);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  body {
-    overflow-x: hidden;
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-bg);
   }
 
-  /* Focus indicator — SPEC.md §14 */
+  /* Focus indicator — SPEC.md §6 */
   *:focus-visible {
-    outline: 2px solid var(--color-plasma-cyan);
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
 
-  /*
-    Reduced motion fallbacks — SPEC.md §14
-    Per-component logic also reads reducedMotion from the store; this CSS
-    catches anything driven by CSS animations/transitions.
-  */
+  /* Reduced motion — SPEC.md §3; the hero also branches in JS */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -93,7 +47,6 @@
     }
   }
 
-  /* Screen-reader-only utility — SPEC.md §14 narration block */
   .sr-only {
     position: absolute;
     width: 1px;
@@ -104,24 +57,5 @@
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border-width: 0;
-  }
-}
-
-@layer utilities {
-  .fixed-stage {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-  }
-
-  /* Blinking cursor for SEND SIGNAL ▮ — SPEC.md §8 */
-  .blink-cursor {
-    animation: blink 0.5s steps(1) infinite;
-  }
-  @keyframes blink {
-    50% {
-      opacity: 0;
-    }
   }
 }
