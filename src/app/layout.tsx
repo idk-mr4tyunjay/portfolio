@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { fontVariables } from "@/lib/fonts";
+import { CommandPalette } from "@/components/home/CommandPalette";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -33,6 +34,7 @@ export default function RootLayout({
       >
         {/* Above the body::before/::after atmosphere layers */}
         <div className="relative z-10">{children}</div>
+        <CommandPalette />
       </body>
     </html>
   );

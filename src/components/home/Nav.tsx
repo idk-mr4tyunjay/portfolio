@@ -1,22 +1,28 @@
+import Link from "next/link";
+
 export function Nav() {
   return (
     <nav
       aria-label="Main"
       className="flex items-center justify-between pt-8"
     >
-      <span
+      <Link
+        href="/"
         className="text-[13px] font-medium"
-        style={{ fontFamily: "var(--font-mono)" }}
+        style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg)" }}
       >
         mj
-      </span>
+      </Link>
       <div className="flex gap-6 text-[13px]">
-        <a href="#work" className="quiet-link">
+        <Link href="/#work" className="quiet-link">
           work
-        </a>
-        <a href="#contact" className="quiet-link">
+        </Link>
+        <Link href="/notes" className="quiet-link">
+          notes
+        </Link>
+        <Link href="/#contact" className="quiet-link">
           contact
-        </a>
+        </Link>
       </div>
     </nav>
   );

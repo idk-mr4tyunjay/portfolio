@@ -145,10 +145,26 @@ first). Contact links live in `src/data/site.ts` (email, github).
 - Fonts: `next/font` (self-hosted, `display: swap`).
 - Lighthouse ≥ 95 across the board on a mid-tier laptop.
 
-## 8. Future (not in v1 — separate issues)
+## 8. Future (separate issues)
 
-- **Notes** (`/notes`): markdown-file-backed writing section, plain
-  static text pages. The repo is the CMS.
 - **Project case-study pages** (`/work/[slug]`).
-- **⌘K command palette** for keyboard navigation.
 - Contact form (Resend) only if plain mailto proves insufficient.
+
+## 9. Notes
+
+The repo is the CMS: `content/notes/*.md` with frontmatter
+(`title`, `date` quoted ISO, `tags`, `summary`). Pipeline is server-only
+(`src/lib/notes.ts` — gray-matter + marked), everything statically
+generated: zero client-side markdown cost.
+
+- **`/notes`** — index with instant search. The full note index is
+  serialized to a small client component (`NotesIndex`); filtering is a
+  plain array scan over title/summary/tags plus tag-chip narrowing.
+  Fine to hundreds of notes; revisit only past that.
+- **`/notes/[slug]`** — statically generated article
+  (`generateStaticParams`), `.note-prose` styles in `globals.css`,
+  per-page metadata from frontmatter.
+- Home shows the three most recent (`NotesPreview`); nav and the ⌘K
+  palette link to `/notes`.
+- The ⌘K palette mounts in the root layout (available on every page);
+  its section actions fall back to `/#section` off the home page.
