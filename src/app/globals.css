@@ -7,6 +7,7 @@
 
 @theme {
   --color-bg: #0a0a0b;
+  --color-bg-raised: #121214;
   --color-fg: #f2f2f4;
   --color-fg-secondary: #8a8a90;
   --color-fg-muted: #6b6b70;
@@ -22,6 +23,35 @@
     color: var(--color-fg);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /*
+    Atmosphere — SPEC.md §3. Two fixed, non-interactive layers:
+    ::before = dot grid + corner glow, ::after = film grain (SVG turbulence).
+    Pure CSS; costs zero JS and kills the flat-black look.
+  */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      radial-gradient(700px 500px at 18% -8%, rgba(124, 246, 255, 0.055), transparent 65%),
+      radial-gradient(circle, rgba(244, 246, 255, 0.033) 1px, transparent 1px);
+    background-size:
+      auto,
+      26px 26px;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.03 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   ::selection {
@@ -69,5 +99,49 @@
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border-width: 0;
+  }
+}
+
+@layer components {
+  .quiet-link {
+    color: var(--color-fg-secondary);
+    transition: color 0.2s;
+  }
+  .quiet-link:hover {
+    color: var(--color-fg);
+  }
+
+  /* Work rows — hover tint extends past the text column */
+  .work-row {
+    margin: 0 -12px;
+    padding: 14px 12px;
+    border-radius: 8px;
+    transition: background 0.25s;
+  }
+  .work-row:hover {
+    background: var(--color-bg-raised);
+  }
+  .work-row .work-name {
+    transition: color 0.2s;
+  }
+  .work-row:hover .work-name {
+    color: var(--color-accent);
+  }
+  .work-row .work-arrow {
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.22, 1.4, 0.36, 1);
+  }
+  .work-row:hover .work-arrow {
+    transform: translate(3px, -3px);
+  }
+
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1;
+    color: var(--color-fg-muted);
+    border: 1px solid var(--color-hairline);
+    border-radius: 999px;
+    padding: 3px 8px;
   }
 }
