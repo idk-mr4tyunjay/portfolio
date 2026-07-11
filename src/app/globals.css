@@ -144,4 +144,80 @@
     border-radius: 999px;
     padding: 3px 8px;
   }
+
+  /* Rendered markdown — SPEC.md §9 */
+  .note-prose {
+    color: var(--color-fg-secondary);
+    font-size: 15.5px;
+    line-height: 1.75;
+  }
+  .note-prose h2 {
+    color: var(--color-fg);
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin: 2.2em 0 0.6em;
+  }
+  .note-prose h3 {
+    color: var(--color-fg);
+    font-size: 16px;
+    font-weight: 500;
+    margin: 1.8em 0 0.5em;
+  }
+  .note-prose p {
+    margin: 0 0 1.1em;
+  }
+  .note-prose a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
+  }
+  .note-prose strong {
+    color: var(--color-fg);
+    font-weight: 500;
+  }
+  .note-prose code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--color-bg-raised);
+    border: 1px solid var(--color-hairline);
+    border-radius: 4px;
+    padding: 0.1em 0.35em;
+  }
+  .note-prose pre {
+    background: var(--color-bg-raised);
+    border: 1px solid var(--color-hairline);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    margin: 0 0 1.4em;
+  }
+  .note-prose pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-fg);
+  }
+  .note-prose ul,
+  .note-prose ol {
+    margin: 0 0 1.1em;
+    padding-left: 1.4em;
+  }
+  .note-prose li {
+    margin-bottom: 0.35em;
+  }
+  .note-prose blockquote {
+    border-left: 2px solid var(--color-hairline);
+    margin: 0 0 1.1em;
+    padding-left: 1em;
+    color: var(--color-fg-muted);
+  }
+  .note-prose hr {
+    border: none;
+    border-top: 1px solid var(--color-hairline);
+    margin: 2em 0;
+  }
 }
