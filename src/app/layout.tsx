@@ -31,7 +31,8 @@ export default function RootLayout({
         className="antialiased"
         style={{ fontFamily: "var(--font-inter)" }}
       >
-        {children}
+        {/* Above the body::before/::after atmosphere layers */}
+        <div className="relative z-10">{children}</div>
       </body>
     </html>
   );
