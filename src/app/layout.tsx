@@ -3,26 +3,21 @@ import { fontVariables } from "@/lib/fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "One Small Step",
+  title: "Mruthunjay — full-stack developer",
   description:
-    "A cinematic scroll-driven portfolio. From the vastness of space, through pixel memories and the digital realm, back to earth.",
+    "Full-stack developer building fast, honest things for the web.",
   openGraph: {
-    title: "One Small Step",
+    title: "Mruthunjay — full-stack developer",
     description:
-      "A cinematic scroll-driven portfolio. From the vastness of space, through pixel memories and the digital realm, back to earth.",
+      "Full-stack developer building fast, honest things for the web.",
     type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "One Small Step",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000308",
+  themeColor: "#0a0a0b",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
 };
 
 export default function RootLayout({
