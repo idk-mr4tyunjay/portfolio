@@ -31,6 +31,11 @@ const OBSTACLE_RADIUS = 70;
 const MIN_SEGMENT = 60;
 const SETTLE_EPSILON = 0.08;
 
+// Entrance: each row rises/fades in with a stagger on first paint
+const ENTRANCE_STAGGER_MS = 70;
+const ENTRANCE_DURATION_MS = 450;
+const ENTRANCE_RISE_PX = 14;
+
 const CURSOR_START: LayoutCursor = { segmentIndex: 0, graphemeIndex: 0 };
 
 export function Hero() {
@@ -80,7 +85,7 @@ export function Hero() {
         {SITE.name} — {SITE.role}
       </h1>
       <p
-        className="mb-8 text-[12.5px]"
+        className="fade-up mb-8 text-[12.5px]"
         style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-secondary)" }}
       >
         <span
@@ -163,6 +168,8 @@ function startReflow(
 
   let rafId = 0;
   let running = false;
+  const entranceStart = performance.now();
+  let entranceDone = false;
 
   const resize = () => {
     width = wrap.clientWidth;
@@ -204,10 +211,27 @@ function startReflow(
     const lh = metrics.lineHeight;
     const maxRows = Math.ceil(height / lh);
     let cursor = CURSOR_START;
+    const elapsed = performance.now() - entranceStart;
+    entranceDone =
+      elapsed > maxRows * ENTRANCE_STAGGER_MS + ENTRANCE_DURATION_MS;
 
     for (let row = 0; row < maxRows; row++) {
       const rowTop = row * lh;
       const rowMid = rowTop + lh / 2;
+
+      // ease-out-cubic entrance per row; collapses to 1 once done
+      let rise = 0;
+      if (!entranceDone) {
+        const t = Math.min(
+          1,
+          Math.max(0, (elapsed - row * ENTRANCE_STAGGER_MS) / ENTRANCE_DURATION_MS),
+        );
+        const eased = 1 - Math.pow(1 - t, 3);
+        ctx.globalAlpha = eased;
+        rise = (1 - eased) * ENTRANCE_RISE_PX;
+      } else {
+        ctx.globalAlpha = 1;
+      }
 
       // Circle ∩ row band → hole [holeL, holeR] carved out of this row
       let segments: Array<[number, number]>;
@@ -231,7 +255,7 @@ function startReflow(
           line.end.graphemeIndex === cursor.graphemeIndex
         )
           return; // safety: no progress
-        ctx.fillText(line.text, x0, rowMid);
+        ctx.fillText(line.text, x0, rowMid + rise);
         cursor = line.end;
       }
     }
@@ -253,7 +277,7 @@ function startReflow(
       Math.abs(tx - ox) +
       Math.abs(ty - oy) +
       Math.abs(tr - r);
-    if (energy < SETTLE_EPSILON) {
+    if (energy < SETTLE_EPSILON && entranceDone) {
       running = false;
       return;
     }
@@ -289,6 +313,7 @@ function startReflow(
   const ro = new ResizeObserver(resize);
   ro.observe(wrap);
   resize();
+  wake();
 
   return () => {
     wrap.removeEventListener("pointermove", onPointerMove);
