@@ -4,8 +4,12 @@ export function Footer() {
   return (
     <footer
       id="contact"
-      className="pb-12 text-[12.5px]"
-      style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}
+      className="fade-up pb-12 text-[12.5px]"
+      style={{
+        fontFamily: "var(--font-mono)",
+        color: "var(--color-fg-muted)",
+        animationDelay: "0.5s",
+      }}
     >
       say hi →{" "}
       <a href={`mailto:${SITE.email}`} style={{ color: "var(--color-accent)" }}>
