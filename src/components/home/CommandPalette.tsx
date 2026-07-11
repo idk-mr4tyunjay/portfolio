@@ -33,11 +33,15 @@ export function CommandPalette() {
 
   const scrollTo = useCallback(
     (id: string) => {
-      const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)")
-        .matches;
-      document
-        .getElementById(id)
-        ?.scrollIntoView({ behavior: smooth ? "smooth" : "auto" });
+      const target = document.getElementById(id);
+      if (target) {
+        const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)")
+          .matches;
+        target.scrollIntoView({ behavior: smooth ? "smooth" : "auto" });
+      } else {
+        // Not on this page — go home to the section
+        window.location.href = `/#${id}`;
+      }
       close();
     },
     [close],
@@ -46,6 +50,15 @@ export function CommandPalette() {
   const actions: Action[] = [
     { id: "work", label: "go to work", hint: "scroll", run: () => scrollTo("work") },
     { id: "contact", label: "go to contact", hint: "scroll", run: () => scrollTo("contact") },
+    {
+      id: "notes",
+      label: "go to notes",
+      hint: "/notes",
+      run: () => {
+        window.location.href = "/notes";
+        close();
+      },
+    },
     {
       id: "github",
       label: "open github",
