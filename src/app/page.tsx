@@ -1,5 +1,6 @@
 import { Nav } from "@/components/home/Nav";
 import { Hero } from "@/components/home/Hero";
+import { Now } from "@/components/home/Now";
 import { WorkList } from "@/components/home/WorkList";
 import { Footer } from "@/components/home/Footer";
 import { CommandPalette } from "@/components/home/CommandPalette";
@@ -10,6 +11,7 @@ export default function Home() {
       <Nav />
       <main>
         <Hero />
+        <Now />
         <WorkList />
       </main>
       <Footer />

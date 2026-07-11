@@ -11,18 +11,10 @@ export function Nav() {
         mj
       </span>
       <div className="flex gap-6 text-[13px]">
-        <a
-          href="#work"
-          className="transition-colors duration-200"
-          style={{ color: "var(--color-fg-secondary)" }}
-        >
+        <a href="#work" className="quiet-link">
           work
         </a>
-        <a
-          href="#contact"
-          className="transition-colors duration-200"
-          style={{ color: "var(--color-fg-secondary)" }}
-        >
+        <a href="#contact" className="quiet-link">
           contact
         </a>
       </div>

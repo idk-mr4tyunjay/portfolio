@@ -24,6 +24,15 @@ export function Footer() {
       >
         github
       </a>{" "}
+      ·{" "}
+      <a
+        href={SITE.repo}
+        target="_blank"
+        rel="noreferrer"
+        className="quiet-link"
+      >
+        source
+      </a>{" "}
       · <kbd style={{ color: "var(--color-fg-secondary)" }}>⌘K</kbd>
     </footer>
   );

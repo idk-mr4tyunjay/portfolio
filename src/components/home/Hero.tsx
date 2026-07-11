@@ -11,7 +11,7 @@ import {
 import { SITE } from "@/data/site";
 
 const INTRO =
-  "I'm Mruthunjay — a full-stack developer who cares about how software feels. I build fast, honest things for the web, and I write down everything that breaks along the way.";
+  "I care about how software feels. I build fast, honest things for the web, and I write down everything that breaks along the way.";
 
 /*
   Cursor-reflow hero — SPEC.md §4.
@@ -80,12 +80,12 @@ export function Hero() {
   }, []);
 
   return (
-    <section aria-label="Intro" className="pt-24 pb-20 md:pt-32">
-      <h1 className="sr-only">
-        {SITE.name} — {SITE.role}
-      </h1>
+    <section
+      aria-label="Intro"
+      className="flex min-h-[72vh] flex-col justify-center pt-16 pb-14"
+    >
       <p
-        className="fade-up mb-8 text-[12.5px]"
+        className="fade-up mb-6 text-[12.5px]"
         style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-secondary)" }}
       >
         <span
@@ -94,6 +94,29 @@ export function Hero() {
           style={{ background: "var(--color-ok)" }}
         />
         available for work
+      </p>
+
+      <h1
+        className="fade-up m-0"
+        style={{
+          fontSize: "clamp(44px, 8vw, 76px)",
+          fontWeight: 500,
+          letterSpacing: "-0.03em",
+          lineHeight: 1.05,
+          animationDelay: "0.05s",
+        }}
+      >
+        {SITE.name}
+      </h1>
+      <p
+        className="fade-up mt-3 mb-10 text-[13px]"
+        style={{
+          fontFamily: "var(--font-mono)",
+          color: "var(--color-fg-muted)",
+          animationDelay: "0.1s",
+        }}
+      >
+        {SITE.role} · web
       </p>
 
       <div ref={wrapRef} className="relative">
@@ -118,6 +141,18 @@ export function Hero() {
           {INTRO}
         </p>
       </div>
+
+      <p
+        aria-hidden
+        className="fade-up mt-16 text-[11px]"
+        style={{
+          fontFamily: "var(--font-mono)",
+          color: "var(--color-fg-muted)",
+          animationDelay: "0.6s",
+        }}
+      >
+        scroll ↓
+      </p>
     </section>
   );
 }
@@ -127,6 +162,7 @@ interface FontMetrics {
   lineHeight: number;
   letterSpacing: number;
   color: string;
+  accent: string;
 }
 
 function readMetrics(el: HTMLElement): FontMetrics {
@@ -137,7 +173,18 @@ function readMetrics(el: HTMLElement): FontMetrics {
     lineHeight: parseFloat(cs.lineHeight),
     letterSpacing: Number.isNaN(spacing) ? 0 : spacing,
     color: cs.color,
+    accent: getComputedStyle(document.documentElement)
+      .getPropertyValue("--color-accent")
+      .trim(),
   };
+}
+
+/** #rrggbb → rgba(...) — canvas gradients can't take CSS variables */
+function withAlpha(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 function startReflow(
@@ -204,7 +251,28 @@ function startReflow(
 
   const draw = () => {
     ctx.clearRect(0, 0, width, height);
+
+    // The obstacle is visible — a soft glow the text flows around,
+    // so visitors discover the signature instead of tripping on it.
+    if (r > 4 && metrics.accent.startsWith("#")) {
+      const glow = ctx.createRadialGradient(ox, oy, 0, ox, oy, r);
+      glow.addColorStop(0, withAlpha(metrics.accent, 0.13));
+      glow.addColorStop(0.7, withAlpha(metrics.accent, 0.05));
+      glow.addColorStop(1, withAlpha(metrics.accent, 0));
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(ox, oy, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
     ctx.font = metrics.font;
+    // Paint must match pretext's measurement — it was given this letterSpacing
+    const spacingCtx = ctx as CanvasRenderingContext2D & {
+      letterSpacing?: string;
+    };
+    if ("letterSpacing" in spacingCtx) {
+      spacingCtx.letterSpacing = `${metrics.letterSpacing}px`;
+    }
     ctx.fillStyle = metrics.color;
     ctx.textBaseline = "middle";
 
