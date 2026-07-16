@@ -46,7 +46,7 @@ export function NotesIndex({ notes }: { notes: NoteMeta[] }) {
           animationDelay: "0.05s",
         }}
       >
-        things I learned, written down — {notes.length} so far
+        things that broke, and what I learned before they broke again, {notes.length} so far
       </p>
 
       <input
@@ -98,7 +98,7 @@ export function NotesIndex({ notes }: { notes: NoteMeta[] }) {
             className="py-8 text-[13px]"
             style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}
           >
-            nothing matches — try fewer letters, or clear the tag filter
+            nothing matches. fewer letters, clear the tag, or maybe I just haven&apos;t broken that one yet
           </li>
         )}
         {filtered.map((note) => (

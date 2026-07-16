@@ -8,7 +8,7 @@ import { SITE } from "@/data/site";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${SITE.name} — ${SITE.role}`,
+    name: `${SITE.name} · ${SITE.role}`,
     short_name: SITE.name,
     description: SITE.tagline,
     start_url: "/",
