@@ -26,9 +26,9 @@
   }
 
   /*
-    Atmosphere — SPEC.md §3. Two fixed, non-interactive layers:
-    ::before = dot grid + corner glow, ::after = film grain (SVG turbulence).
-    Pure CSS; costs zero JS and kills the flat-black look.
+    Atmosphere — SPEC.md §3. Fixed, non-interactive layers:
+    ::before = corner glow, ::after = film grain (SVG turbulence).
+    The dot field is a canvas (DotField.tsx) so marks react per-dot.
   */
   body::before {
     content: "";
@@ -37,11 +37,7 @@
     pointer-events: none;
     z-index: 0;
     background-image:
-      radial-gradient(700px 500px at 18% -8%, rgba(124, 246, 255, 0.055), transparent 65%),
-      radial-gradient(circle, rgba(244, 246, 255, 0.033) 1px, transparent 1px);
-    background-size:
-      auto,
-      26px 26px;
+      radial-gradient(700px 500px at 18% -8%, rgba(124, 246, 255, 0.055), transparent 65%);
   }
 
   body::after {
