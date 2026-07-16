@@ -15,5 +15,5 @@ export const SITE = {
   now: "currently building this site instead of finishing the last one. going great, by which I mean going.",
   /** Short prose for the about section. */
   about:
-    "I like owning things end to end — design, build, ship, and the 2am debugging that follows. Most of my time goes into the web: making interfaces feel fast and honest, and understanding the machinery underneath. The rest goes into notes, so the second time something breaks it only costs me a search — not another 2am.",
+    "I like owning things end to end. Design, build, ship, and the 2am debugging that follows. Most of my time goes into the web: making interfaces feel fast and honest, and understanding the machinery underneath. The rest goes into notes, so the second time something breaks it only costs me a search, not another 2am.",
 } as const;

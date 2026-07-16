@@ -5,13 +5,13 @@ import { DotField } from "@/components/home/DotField";
 import { SITE } from "@/data/site";
 import "./globals.css";
 
-const TITLE = `${SITE.name} — ${SITE.role}`;
+const TITLE = `${SITE.name} · ${SITE.role}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
     default: TITLE,
-    template: `%s — ${SITE.name}`,
+    template: `%s · ${SITE.name}`,
   },
   description: SITE.tagline,
   applicationName: SITE.name,
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     siteName: SITE.name,
     title: {
       default: TITLE,
-      template: `%s — ${SITE.name}`,
+      template: `%s · ${SITE.name}`,
     },
     description: SITE.tagline,
     locale: "en_US",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: {
       default: TITLE,
-      template: `%s — ${SITE.name}`,
+      template: `%s · ${SITE.name}`,
     },
     description: SITE.tagline,
   },
