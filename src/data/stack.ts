@@ -1,6 +1,5 @@
 /*
   Stack section — SPEC.md §5. Grouped, honest, no proficiency bars.
-  TODO: edit to your actual day-to-day tools.
 */
 
 export interface StackGroup {
@@ -11,18 +10,18 @@ export interface StackGroup {
 export const STACK: StackGroup[] = [
   {
     group: "languages",
-    items: ["TypeScript", "JavaScript", "SQL"],
+    items: ["TypeScript", "JavaScript", "Solidity"],
   },
   {
     group: "frontend",
-    items: ["React", "Next.js", "Tailwind CSS"],
+    items: ["React", "Next.js", "Tailwind CSS", "Three.js"],
   },
   {
     group: "backend",
-    items: ["Node.js", "Postgres", "REST APIs"],
+    items: ["Node.js", "MongoDB", "GraphQL"],
   },
   {
     group: "tools",
-    items: ["Git", "Docker", "Vercel"],
+    items: ["Git", "Docker", "Redis"],
   },
 ];
