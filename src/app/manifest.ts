@@ -1,0 +1,31 @@
+import type { MetadataRoute } from "next";
+import { SITE } from "@/data/site";
+
+/*
+  Web app manifest — served at /manifest.webmanifest, auto-linked by Next.
+  Colors mirror the design tokens in globals.css.
+*/
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: `${SITE.name} · ${SITE.role}`,
+    short_name: SITE.name,
+    description: SITE.tagline,
+    start_url: "/",
+    display: "standalone",
+    background_color: "#0a0a0b",
+    theme_color: "#0a0a0b",
+    icons: [
+      {
+        src: "/icon.svg",
+        sizes: "any",
+        type: "image/svg+xml",
+      },
+      {
+        src: "/apple-icon",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  };
+}

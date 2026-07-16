@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.env
+.env.local
+.env.*.local
+.claude
+.agents
+.mcp.json
+.superdesign
+.playwright-mcp
+*.tsbuildinfo
+npm-debug.log*
+.DS_Store

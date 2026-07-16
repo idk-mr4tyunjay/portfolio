@@ -1,0 +1,407 @@
+@import "tailwindcss";
+
+/*
+  Design tokens.
+  Anything that ships to the DOM references these — never inline a hex.
+*/
+
+@theme {
+  --color-bg: #0a0a0b;
+  --color-bg-raised: #121214;
+  --color-fg: #f2f2f4;
+  --color-fg-body: #cdced3;
+  --color-fg-secondary: #b4b4ba;
+  --color-fg-muted: #98989f;
+  --color-hairline: #1e1e20;
+  --color-accent: #7cf6ff;
+  --color-ok: #4ade80;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+    scrollbar-color: var(--color-hairline) transparent;
+  }
+
+  html,
+  body {
+    background: var(--color-bg);
+    color: var(--color-fg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The nav backdrop bleeds to 50vw; keep scrollbar-width overshoot from scrolling */
+  body {
+    overflow-x: clip;
+  }
+
+  /* Anchored sections clear the sticky nav (~60px) plus breathing room */
+  [id] {
+    scroll-margin-top: 72px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-hairline);
+    border-radius: 5px;
+    border: 3px solid var(--color-bg);
+  }
+
+  kbd {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    margin: 0 2px;
+    border: 1px solid var(--color-hairline);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    background: var(--color-bg-raised);
+  }
+
+  /*
+    Atmosphere. Fixed, non-interactive layers:
+    ::before = corner glow, ::after = film grain (SVG turbulence).
+    The dot field is a canvas (DotField.tsx) so marks react per-dot.
+  */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      radial-gradient(700px 500px at 18% -8%, rgba(124, 246, 255, 0.055), transparent 65%);
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.03 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-bg);
+  }
+
+  /* Focus indicator */
+  *:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Entrance — killed by the reduced-motion block above */
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  .fade-up {
+    animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Micro-animations — all killed by the reduced-motion block above */
+  @keyframes scroll-bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(4px);
+    }
+  }
+  @keyframes palette-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.985);
+    }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+@layer components {
+  .quiet-link {
+    color: var(--color-fg-secondary);
+    transition: color 0.2s;
+  }
+  .quiet-link:hover {
+    color: var(--color-fg);
+  }
+
+  /* Work rows — hover tint extends past the text column */
+  .work-row {
+    margin: 0 -12px;
+    padding: 14px 12px;
+    border-radius: 8px;
+    transition: background 0.25s;
+  }
+  .work-row:hover,
+  .work-row:active {
+    background: var(--color-bg-raised);
+  }
+  .work-row .work-name {
+    transition: color 0.2s;
+  }
+  .work-row:hover .work-name {
+    color: var(--color-accent);
+  }
+  /* Row number joins the hover moment */
+  .work-num {
+    color: var(--color-fg-muted);
+    transition: color 0.2s;
+  }
+  .work-row:hover .work-num {
+    color: var(--color-accent);
+  }
+
+  /* Note rows carry a left rule, like the margin line in a notebook */
+  .note-row {
+    border-left: 2px solid var(--color-hairline);
+    border-radius: 0 8px 8px 0;
+    padding-left: 10px;
+    transition:
+      background 0.25s,
+      border-color 0.25s;
+  }
+  .note-row:hover,
+  .note-row:active {
+    border-left-color: var(--color-accent);
+  }
+  /* Entry link icons (globe, X, Product Hunt) — subtle lift on hover */
+  .entry-icon {
+    display: inline-flex;
+    opacity: 0.85;
+    transition:
+      opacity 0.2s,
+      transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .entry-icon:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1;
+    color: var(--color-fg-muted);
+    border: 1px solid var(--color-hairline);
+    border-radius: 999px;
+    padding: 3px 8px;
+    transition:
+      color 0.2s,
+      background 0.2s,
+      border-color 0.2s;
+  }
+  /* Interactive chips (tag filters) lift on hover */
+  .chip-btn:hover {
+    color: var(--color-fg-secondary);
+    border-color: var(--color-fg-muted);
+  }
+
+  /* Sticky nav — hides on scroll down, returns on scroll up (Nav.tsx) */
+  /* Margin keeps the resting offset; only the padded box pins, so the bar stays slim */
+  .nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    margin-top: 20px;
+    padding-top: 12px;
+    padding-bottom: 10px;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* Full-bleed blurred backdrop, visible only once content scrolls under */
+  .nav-bar::before {
+    content: "";
+    position: absolute;
+    inset: 0 calc(50% - 50vw);
+    z-index: -1;
+    background: color-mix(in srgb, var(--color-bg) 82%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--color-hairline);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .nav-bar.nav-scrolled::before {
+    opacity: 1;
+  }
+  .nav-bar.nav-hidden {
+    transform: translateY(-101%);
+  }
+
+  /* Nav links — underline reveals from the left on hover */
+  .nav-link {
+    position: relative;
+  }
+  /* Links carry py-2 for tap area; 5px keeps the line 3px under the text */
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 5px;
+    width: 100%;
+    height: 1px;
+    background: var(--color-fg);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .nav-link:hover::after {
+    transform: scaleX(1);
+  }
+
+  /* Hero scroll cue — gentle looping bob */
+  .scroll-cue {
+    display: inline-block;
+    animation: scroll-bob 2.4s ease-in-out infinite;
+  }
+
+  /* Command palette entrance */
+  .palette-backdrop {
+    animation: palette-in 0.18s ease both;
+  }
+  .palette-panel {
+    animation: panel-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Arrow links — the glyph nudges toward its direction on hover */
+  .arrow {
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.22, 1.4, 0.36, 1);
+  }
+  .arrow-link:hover .arrow {
+    transform: translateX(3px);
+  }
+  .arrow-link.diag:hover .arrow {
+    transform: translate(2px, -2px);
+  }
+
+  /* Rendered markdown */
+  .note-prose {
+    color: var(--color-fg-body);
+    font-size: 15.5px;
+    line-height: 1.75;
+  }
+  .note-prose h2 {
+    color: var(--color-fg);
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 2.2em 0 0.6em;
+  }
+  .note-prose h3 {
+    color: var(--color-fg);
+    font-size: 16px;
+    font-weight: 600;
+    margin: 1.8em 0 0.5em;
+  }
+  .note-prose p {
+    margin: 0 0 1.1em;
+  }
+  .note-prose a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
+  }
+  .note-prose strong {
+    color: var(--color-fg);
+    font-weight: 500;
+  }
+  .note-prose code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--color-bg-raised);
+    border: 1px solid var(--color-hairline);
+    border-radius: 4px;
+    padding: 0.1em 0.35em;
+  }
+  .note-prose pre {
+    background: var(--color-bg-raised);
+    border: 1px solid var(--color-hairline);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    margin: 0 0 1.4em;
+  }
+  .note-prose pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-fg);
+  }
+  .note-prose ul,
+  .note-prose ol {
+    margin: 0 0 1.1em;
+    padding-left: 1.4em;
+  }
+  .note-prose li {
+    margin-bottom: 0.35em;
+  }
+  .note-prose blockquote {
+    border-left: 2px solid var(--color-hairline);
+    margin: 0 0 1.1em;
+    padding-left: 1em;
+    color: var(--color-fg-muted);
+  }
+  .note-prose hr {
+    border: none;
+    border-top: 1px solid var(--color-hairline);
+    margin: 2em 0;
+  }
+  /* End-of-article mark */
+  .note-prose::after {
+    content: "";
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    margin: 2.5em auto 0;
+  }
+}
