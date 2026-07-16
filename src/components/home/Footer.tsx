@@ -1,18 +1,10 @@
 import { SITE } from "@/data/site";
+import { SectionLabel } from "./SectionLabel";
 
 export function Footer() {
   return (
     <footer id="contact" className="pb-14">
-      <p
-        className="fade-up mb-3 text-xs"
-        style={{
-          fontFamily: "var(--font-mono)",
-          color: "var(--color-fg-muted)",
-          animationDelay: "0.3s",
-        }}
-      >
-        contact
-      </p>
+      <SectionLabel delay="0.3s">contact</SectionLabel>
       <p
         className="fade-up mb-2 text-[22px] font-semibold"
         style={{ letterSpacing: "-0.01em", animationDelay: "0.35s" }}
@@ -79,7 +71,7 @@ export function Footer() {
         }}
       >
         © 2026 {SITE.name.toLowerCase()} ·
-        <kbd>⌘K</kbd> anywhere · this line was legally required by me
+        <kbd>⌘K</kbd> anywhere
       </p>
     </footer>
   );

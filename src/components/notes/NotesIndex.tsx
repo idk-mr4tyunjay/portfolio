@@ -92,7 +92,7 @@ export function NotesIndex({ notes }: { notes: NoteMeta[] }) {
         </div>
       )}
 
-      <ul className="mt-8" style={{ borderTop: "1px solid var(--color-hairline)" }}>
+      <ul className="mt-8">
         {filtered.length === 0 && (
           <li
             className="py-8 text-[13px]"
@@ -102,11 +102,8 @@ export function NotesIndex({ notes }: { notes: NoteMeta[] }) {
           </li>
         )}
         {filtered.map((note) => (
-          <li
-            key={note.slug}
-            style={{ borderBottom: "1px solid var(--color-hairline)" }}
-          >
-            <Link href={`/notes/${note.slug}`} className="work-row block">
+          <li key={note.slug}>
+            <Link href={`/notes/${note.slug}`} className="work-row note-row block">
               <span className="flex items-baseline gap-4">
                 <span className="work-name flex-1 text-[16px] font-medium">
                   {note.title}

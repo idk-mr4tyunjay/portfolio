@@ -13,7 +13,10 @@ export const EXPERIENCE: Experience[] = [
       "Building real-time cross-border payments on stablecoin rails, where sending money is as simple as a name or an email and it settles instantly.",
     url: "https://payflip.xyz",
     tech: ["stablecoins"],
-    links: [{ type: "x", url: "https://x.com/payflipxyz" }],
+    links: [
+      { type: "github", url: "https://github.com/payflip-labs" },
+      { type: "x", url: "https://x.com/payflipxyz" },
+    ],
   },
   {
     role: "Engineer",
@@ -24,6 +27,7 @@ export const EXPERIENCE: Experience[] = [
     url: "https://www.contextpool.io/",
     tech: ["mcp", "cli"],
     links: [
+      { type: "github", url: "https://github.com/syv-labs/contextpool" },
       { type: "producthunt", url: "https://www.producthunt.com/products/contextpool" },
     ],
   },
@@ -35,6 +39,10 @@ export const EXPERIENCE: Experience[] = [
       "Built DeFi infrastructure for emerging EVM chains, live on XRPL-EVM mainnet.",
     url: "https://app.surgedefi.com",
     tech: ["solidity", "evm"],
-    links: [{ type: "x", url: "https://x.com/Surgedefi_hq" }],
+    links: [
+      // Repo is private — org page is the closest public thing
+      { type: "github", url: "https://github.com/syv-labs" },
+      { type: "x", url: "https://x.com/Surgedefi_hq" },
+    ],
   },
 ];

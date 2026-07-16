@@ -14,7 +14,7 @@ export interface NoteMeta {
 
 /** Extra platform link shown as a small icon (the `type` picks the icon). */
 export interface EntryLink {
-  type: "x" | "producthunt";
+  type: "github" | "x" | "producthunt";
   url: string;
 }
 

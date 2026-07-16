@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getAllNotes } from "@/lib/notes";
+import { SectionLabel } from "./SectionLabel";
 
 export function NotesPreview() {
   const notes = getAllNotes().slice(0, 3);
@@ -7,27 +8,15 @@ export function NotesPreview() {
 
   return (
     <section aria-label="Recent notes" className="pb-20">
-      <p
-        className="fade-up mb-3 text-xs"
-        style={{
-          fontFamily: "var(--font-mono)",
-          color: "var(--color-fg-muted)",
-          animationDelay: "0.3s",
-        }}
-      >
-        recent notes
-      </p>
-      <ul style={{ borderTop: "1px solid var(--color-hairline)" }}>
+      <SectionLabel delay="0.3s">recent notes</SectionLabel>
+      <ul>
         {notes.map((note, index) => (
           <li
             key={note.slug}
             className="fade-up"
-            style={{
-              borderBottom: "1px solid var(--color-hairline)",
-              animationDelay: `${0.35 + index * 0.06}s`,
-            }}
+            style={{ animationDelay: `${0.35 + index * 0.06}s` }}
           >
-            <Link href={`/notes/${note.slug}`} className="work-row block">
+            <Link href={`/notes/${note.slug}`} className="work-row note-row block">
               <span className="flex items-baseline gap-4">
                 <span className="work-name flex-1 text-[15px] font-medium">
                   {note.title}
