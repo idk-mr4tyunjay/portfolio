@@ -21,3 +21,15 @@ export interface Project {
   url?: string;
   tech?: string[];
 }
+
+export interface Experience {
+  role: string;
+  company: string;
+  /** Free-form range, e.g. "2025 – present" */
+  period: string;
+  /** One honest sentence. */
+  description: string;
+  /** External URL — row renders ↗ when present */
+  url?: string;
+  tech?: string[];
+}

@@ -1,29 +1,29 @@
 import type { Project } from "@/types";
 
 /*
-  Work list — SPEC.md §5. Newest first, 3–5 entries.
-  TODO: replace placeholders with real projects.
+  Side projects — SPEC.md §5. Newest first.
+  VPS Setup and Growix are placeholders until the repos are public.
 */
 
 export const PROJECTS: Project[] = [
   {
-    name: "Project one",
-    description: "Replace with what it does — one honest sentence.",
+    name: "VPS Setup",
+    description: "A repeatable setup for provisioning and hardening a fresh VPS.",
     year: "2026",
-    url: "https://github.com/idk-mr4tyunjay",
-    tech: ["next", "postgres"],
+    // url: add once the repo is public
+    tech: ["bash", "docker"],
   },
   {
-    name: "Project two",
-    description: "Replace with the problem it solved.",
+    name: "Growix",
+    description: "Currently private, going public soon.",
     year: "2025",
-    url: "https://github.com/idk-mr4tyunjay",
-    tech: ["react", "node"],
+    // url + tech to come when it goes public
   },
   {
-    name: "Project three",
-    description: "Replace with what you learned shipping it.",
-    year: "2025",
-    tech: ["typescript"],
+    name: "Multi-Window",
+    description: "State synced across multiple browser windows via Three.js. Nobody needed this. I built it anyway.",
+    year: "2024",
+    url: "https://multi-window-xd.vercel.app/",
+    tech: ["three.js"],
   },
 ];
