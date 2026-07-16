@@ -20,7 +20,6 @@ export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(0);
-  const [copied, setCopied] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);
 
@@ -49,6 +48,7 @@ export function CommandPalette() {
 
   const actions: Action[] = [
     { id: "work", label: "go to work", hint: "scroll", run: () => scrollTo("work") },
+    { id: "projects", label: "go to projects", hint: "scroll", run: () => scrollTo("projects") },
     { id: "contact", label: "go to contact", hint: "scroll", run: () => scrollTo("contact") },
     {
       id: "notes",
@@ -69,16 +69,12 @@ export function CommandPalette() {
       },
     },
     {
-      id: "email",
-      label: copied ? "copied!" : "copy email",
-      hint: SITE.email,
+      id: "linkedin",
+      label: "open linkedin",
+      hint: "new tab",
       run: () => {
-        navigator.clipboard?.writeText(SITE.email);
-        setCopied(true);
-        setTimeout(() => {
-          setCopied(false);
-          close();
-        }, 600);
+        window.open(SITE.linkedin, "_blank", "noreferrer");
+        close();
       },
     },
   ];
@@ -166,7 +162,7 @@ export function CommandPalette() {
               className="px-4 py-2 text-sm"
               style={{ color: "var(--color-fg-muted)" }}
             >
-              nothing matches
+              nothing matches. probably a me problem.
             </li>
           )}
           {filtered.map((action, index) => (

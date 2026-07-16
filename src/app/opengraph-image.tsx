@@ -7,7 +7,7 @@ import { SITE } from "@/data/site";
   Colors mirror the design tokens in globals.css.
 */
 
-export const alt = `${SITE.name} — ${SITE.role}`;
+export const alt = `${SITE.name} · ${SITE.role}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

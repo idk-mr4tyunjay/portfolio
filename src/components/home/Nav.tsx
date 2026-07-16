@@ -17,6 +17,9 @@ export function Nav() {
         <Link href="/#work" className="quiet-link">
           work
         </Link>
+        <Link href="/#projects" className="quiet-link">
+          projects
+        </Link>
         <Link href="/notes" className="quiet-link">
           notes
         </Link>
