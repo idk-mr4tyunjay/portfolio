@@ -55,7 +55,7 @@ export function NotesIndex({ notes }: { notes: NoteMeta[] }) {
         placeholder="search title, summary, tags…"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="fade-up w-full bg-transparent py-3 text-[15px] outline-none"
+        className="fade-up w-full bg-transparent py-3 text-[16px] outline-none"
         style={{
           fontFamily: "var(--font-mono)",
           color: "var(--color-fg)",
@@ -120,7 +120,7 @@ export function NotesIndex({ notes }: { notes: NoteMeta[] }) {
               </span>
               <span
                 className="mt-1 block text-[13.5px] leading-relaxed"
-                style={{ color: "var(--color-fg-secondary)" }}
+                style={{ color: "var(--color-fg-body)" }}
               >
                 {note.summary}
               </span>

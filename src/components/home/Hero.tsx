@@ -28,10 +28,10 @@ export function Hero() {
         {SITE.name}
       </h1>
       <p
-        className="fade-up mt-3 mb-10 text-[13px]"
+        className="fade-up mt-3 mb-10 text-[14px]"
         style={{
           fontFamily: "var(--font-mono)",
-          color: "var(--color-fg-muted)",
+          color: "var(--color-fg-secondary)",
           animationDelay: "0.1s",
         }}
       >

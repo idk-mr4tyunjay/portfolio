@@ -12,14 +12,21 @@ export interface NoteMeta {
   summary: string;
 }
 
+/** Extra platform link shown as a small icon (the `type` picks the icon). */
+export interface EntryLink {
+  type: "x" | "producthunt";
+  url: string;
+}
+
 export interface Project {
   name: string;
   /** One honest sentence. */
   description: string;
   year: string;
-  /** External URL — row renders ↗ when present */
+  /** Primary site — row renders a globe icon when present */
   url?: string;
   tech?: string[];
+  links?: EntryLink[];
 }
 
 export interface Experience {
@@ -29,7 +36,8 @@ export interface Experience {
   period: string;
   /** One honest sentence. */
   description: string;
-  /** External URL — row renders ↗ when present */
+  /** Primary site — row renders a globe icon when present */
   url?: string;
   tech?: string[];
+  links?: EntryLink[];
 }

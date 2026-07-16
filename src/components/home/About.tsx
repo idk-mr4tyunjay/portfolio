@@ -1,5 +1,7 @@
 import { SITE } from "@/data/site";
 import { STACK } from "@/data/stack";
+import { TECH_ICONS } from "@/data/tech-icons";
+import { TechIcon } from "@/components/icons";
 
 export function About() {
   return (
@@ -16,7 +18,7 @@ export function About() {
       </p>
       <p
         className="fade-up max-w-[58ch] text-[15px] leading-relaxed"
-        style={{ color: "var(--color-fg-secondary)", animationDelay: "0.25s" }}
+        style={{ color: "var(--color-fg-body)", animationDelay: "0.25s" }}
       >
         {SITE.about}
       </p>
@@ -39,14 +41,17 @@ export function About() {
             >
               {group.group}
             </p>
-            <ul className="flex flex-col gap-1.5">
+            <ul className="flex flex-col gap-2">
               {group.items.map((item) => (
                 <li
-                  key={item}
-                  className="text-[14px]"
+                  key={item.name}
+                  className="flex items-center gap-2 text-[14px]"
                   style={{ color: "var(--color-fg-secondary)" }}
                 >
-                  {item}
+                  <span className="inline-flex shrink-0">
+                    <TechIcon path={TECH_ICONS[item.icon]} />
+                  </span>
+                  {item.name}
                 </li>
               ))}
             </ul>

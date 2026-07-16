@@ -14,7 +14,7 @@ export function Footer() {
         contact
       </p>
       <p
-        className="fade-up mb-2 text-[22px] font-medium"
+        className="fade-up mb-2 text-[22px] font-semibold"
         style={{ letterSpacing: "-0.01em", animationDelay: "0.35s" }}
       >
         have something to build?
@@ -71,7 +71,7 @@ export function Footer() {
       </details>
 
       <p
-        className="fade-up mt-8 text-[11px]"
+        className="fade-up mt-8 text-[12px]"
         style={{
           fontFamily: "var(--font-mono)",
           color: "var(--color-fg-muted)",
