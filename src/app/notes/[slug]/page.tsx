@@ -3,7 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Nav } from "@/components/home/Nav";
 import { Footer } from "@/components/home/Footer";
+import { JsonLd } from "@/components/JsonLd";
 import { getAllNotes, getNote } from "@/lib/notes";
+import { OG_IMAGE } from "@/lib/seo";
+import { SITE } from "@/data/site";
 
 export function generateStaticParams() {
   return getAllNotes().map((note) => ({ slug: note.slug }));
@@ -16,9 +19,29 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const note = getNote((await params).slug);
   if (!note) return {};
+  const url = `/notes/${note.meta.slug}`;
+  const description = note.meta.summary || undefined;
   return {
-    title: `${note.meta.title} — Mruthunjay`,
-    description: note.meta.summary,
+    title: note.meta.title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: note.meta.title,
+      description,
+      type: "article",
+      url,
+      siteName: SITE.name,
+      locale: "en_US",
+      publishedTime: note.meta.date,
+      tags: note.meta.tags,
+      images: [OG_IMAGE],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: note.meta.title,
+      description,
+      images: [OG_IMAGE],
+    },
   };
 }
 
@@ -32,6 +55,22 @@ export default async function NotePage({
 
   return (
     <div className="mx-auto max-w-[720px] px-6">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: note.meta.title,
+          description: note.meta.summary || undefined,
+          datePublished: note.meta.date,
+          url: `${SITE.url}/notes/${note.meta.slug}`,
+          keywords: note.meta.tags.join(", ") || undefined,
+          author: {
+            "@type": "Person",
+            name: SITE.name,
+            url: SITE.url,
+          },
+        }}
+      />
       <Nav />
       <main>
         <article className="pt-16 pb-20">
