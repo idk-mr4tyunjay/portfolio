@@ -8,9 +8,14 @@ export function Nav() {
     >
       <Link
         href="/"
-        className="text-[13px] font-medium"
+        className="flex items-center gap-2 text-[13px] font-medium"
         style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg)" }}
       >
+        <span
+          aria-hidden
+          className="inline-block size-2 rounded-full"
+          style={{ background: "var(--color-accent)" }}
+        />
         mj
       </Link>
       <div className="flex gap-6 text-[13px]">
