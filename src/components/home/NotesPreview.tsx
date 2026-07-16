@@ -44,8 +44,8 @@ export function NotesPreview() {
         ))}
       </ul>
       <p className="fade-up mt-4 text-[13px]" style={{ animationDelay: "0.5s" }}>
-        <Link href="/notes" className="quiet-link">
-          all notes →
+        <Link href="/notes" className="quiet-link arrow-link">
+          all notes <span className="arrow">→</span>
         </Link>
       </p>
     </section>

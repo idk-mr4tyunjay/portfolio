@@ -1,5 +1,5 @@
 /*
-  Stack section — SPEC.md §5. Grouped, honest, no proficiency bars.
+  Stack section. Grouped, honest, no proficiency bars.
 */
 
 export interface StackGroup {

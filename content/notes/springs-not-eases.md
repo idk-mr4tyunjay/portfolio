@@ -14,7 +14,7 @@ v = v * damping + (target - x) * stiffness;
 x += v;
 ```
 
-per axis, per frame. On this site the hero's obstacle uses `damping 0.8, stiffness 0.16`, tuned by feel: higher stiffness snaps, higher damping oozes.
+per axis, per frame. Constants like `damping 0.8, stiffness 0.16` are tuned by feel: higher stiffness snaps, higher damping oozes.
 
 ## The part nobody mentions: springs know when they're done
 

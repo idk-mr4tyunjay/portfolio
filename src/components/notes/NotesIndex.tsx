@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { NoteMeta } from "@/types";
 
 /*
-  Instant search — SPEC.md §9. The full note index arrives serialized from the
+  Instant search. The full note index arrives serialized from the
   server; filtering is a plain array scan (hundreds of notes = still instant).
   Matches across title, summary, and tags; tag chips narrow further.
 */
@@ -74,7 +74,7 @@ export function NotesIndex({ notes }: { notes: NoteMeta[] }) {
                 type="button"
                 onClick={() => setActiveTag(active ? null : tag)}
                 aria-pressed={active}
-                className="chip cursor-pointer"
+                className="chip chip-btn cursor-pointer"
                 style={
                   active
                     ? {

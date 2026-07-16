@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
-  Design tokens — SPEC.md §3.
+  Design tokens.
   Anything that ships to the DOM references these — never inline a hex.
 */
 
@@ -26,7 +26,7 @@
   }
 
   /*
-    Atmosphere — SPEC.md §3. Fixed, non-interactive layers:
+    Atmosphere. Fixed, non-interactive layers:
     ::before = corner glow, ::after = film grain (SVG turbulence).
     The dot field is a canvas (DotField.tsx) so marks react per-dot.
   */
@@ -55,13 +55,13 @@
     color: var(--color-bg);
   }
 
-  /* Focus indicator — SPEC.md §6 */
+  /* Focus indicator */
   *:focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
 
-  /* Reduced motion — SPEC.md §3; the hero also branches in JS */
+  /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -73,7 +73,7 @@
     }
   }
 
-  /* Entrance — SPEC.md §3; killed by the reduced-motion block above */
+  /* Entrance — killed by the reduced-motion block above */
   @keyframes fade-up {
     from {
       opacity: 0;
@@ -83,6 +83,28 @@
 
   .fade-up {
     animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Micro-animations — all killed by the reduced-motion block above */
+  @keyframes scroll-bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(4px);
+    }
+  }
+  @keyframes palette-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.985);
+    }
   }
 
   .sr-only {
@@ -139,9 +161,64 @@
     border: 1px solid var(--color-hairline);
     border-radius: 999px;
     padding: 3px 8px;
+    transition:
+      color 0.2s,
+      background 0.2s,
+      border-color 0.2s;
+  }
+  /* Interactive chips (tag filters) lift on hover */
+  .chip-btn:hover {
+    color: var(--color-fg-secondary);
+    border-color: var(--color-fg-muted);
   }
 
-  /* Rendered markdown — SPEC.md §9 */
+  /* Nav links — underline reveals from the left on hover */
+  .nav-link {
+    position: relative;
+  }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 100%;
+    height: 1px;
+    background: var(--color-fg);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .nav-link:hover::after {
+    transform: scaleX(1);
+  }
+
+  /* Hero scroll cue — gentle looping bob */
+  .scroll-cue {
+    display: inline-block;
+    animation: scroll-bob 2.4s ease-in-out infinite;
+  }
+
+  /* Command palette entrance */
+  .palette-backdrop {
+    animation: palette-in 0.18s ease both;
+  }
+  .palette-panel {
+    animation: panel-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Arrow links — the glyph nudges toward its direction on hover */
+  .arrow {
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.22, 1.4, 0.36, 1);
+  }
+  .arrow-link:hover .arrow {
+    transform: translateX(3px);
+  }
+  .arrow-link.diag:hover .arrow {
+    transform: translate(2px, -2px);
+  }
+
+  /* Rendered markdown */
   .note-prose {
     color: var(--color-fg-secondary);
     font-size: 15.5px;

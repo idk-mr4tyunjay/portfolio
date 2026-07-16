@@ -1,7 +1,7 @@
 import { Inter, JetBrains_Mono } from "next/font/google";
 
 /*
-  Typography — SPEC.md §3.
+  Typography.
   - Inter: everything
   - JetBrains Mono: logo, labels, meta, status line
 */

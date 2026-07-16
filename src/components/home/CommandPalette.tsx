@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { SITE } from "@/data/site";
 
 /*
-  Command palette — SPEC.md §8, hand-rolled (no deps).
+  Command palette, hand-rolled (no deps).
   cmd/ctrl+K toggles. Type to filter, ↑↓ + ↵ to run, esc / backdrop closes.
   Focus moves into the input on open and back to the previous element on close.
 */
@@ -113,7 +113,7 @@ export function CommandPalette() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center px-6 pt-[18vh]"
+      className="palette-backdrop fixed inset-0 z-50 flex items-start justify-center px-6 pt-[18vh]"
       style={{ background: "rgba(0, 0, 0, 0.6)" }}
       onClick={close}
     >
@@ -121,7 +121,7 @@ export function CommandPalette() {
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
-        className="w-full max-w-md overflow-hidden rounded-lg"
+        className="palette-panel w-full max-w-md overflow-hidden rounded-lg"
         style={{
           background: "var(--color-bg)",
           border: "1px solid var(--color-hairline)",
@@ -178,6 +178,7 @@ export function CommandPalette() {
                       ? "var(--color-hairline)"
                       : "transparent",
                   color: "var(--color-fg)",
+                  transition: "background 0.12s",
                 }}
               >
                 <span>{action.label}</span>

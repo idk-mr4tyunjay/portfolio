@@ -1,7 +1,7 @@
 import type { Project } from "@/types";
 
 /*
-  Side projects — SPEC.md §5. Newest first.
+  Side projects. Newest first.
   VPS Setup and Growix are placeholders until the repos are public.
 */
 

@@ -1,5 +1,5 @@
 /*
-  Reusable list section — SPEC.md §5. Shared by Work Experience and Side
+  Reusable list section. Shared by Work Experience and Side
   Projects; keeps the numbered-row layout in one place. Content-free: callers
   map their data (projects, experience) into ListEntry and pass it in.
 */
