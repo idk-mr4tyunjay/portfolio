@@ -2,20 +2,12 @@ import { SITE } from "@/data/site";
 import { STACK } from "@/data/stack";
 import { TECH_ICONS } from "@/data/tech-icons";
 import { TechIcon } from "@/components/icons";
+import { SectionLabel } from "./SectionLabel";
 
 export function About() {
   return (
     <section id="about" aria-label="About" className="pb-20">
-      <p
-        className="fade-up mb-3 text-xs"
-        style={{
-          fontFamily: "var(--font-mono)",
-          color: "var(--color-fg-muted)",
-          animationDelay: "0.2s",
-        }}
-      >
-        about
-      </p>
+      <SectionLabel delay="0.2s">about</SectionLabel>
       <p
         className="fade-up max-w-[58ch] text-[15px] leading-relaxed"
         style={{ color: "var(--color-fg-body)", animationDelay: "0.25s" }}

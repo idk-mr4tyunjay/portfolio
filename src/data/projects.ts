@@ -1,23 +1,27 @@
 import type { Project } from "@/types";
+import { SITE } from "./site";
 
 /*
   Side projects. Newest first.
-  VPS Setup and Growix are placeholders until the repos are public.
+  Private repos point their GitHub link at the profile until they go public.
 */
 
 export const PROJECTS: Project[] = [
   {
-    name: "VPS Setup",
-    description: "A repeatable setup for provisioning and hardening a fresh VPS.",
+    name: "Growix",
+    description: "A personal growth PWA for habits, plans and learning, self-hosted on a VPS.",
     year: "2026",
-    // url: add once the repo is public
-    tech: ["bash", "docker"],
+    url: "https://growix.devtown.lol",
+    tech: ["next.js", "postgres", "docker"],
+    links: [{ type: "github", url: "https://github.com/idk-mr4tyunjay/growix" }],
   },
   {
-    name: "Growix",
-    description: "Currently private, going public soon.",
-    year: "2025",
-    // url + tech to come when it goes public
+    name: "VPS Setup",
+    description: "Scripts to provision and harden a fresh VPS, from first login to running apps.",
+    year: "2026",
+    url: "https://idk-mr4tyunjay.github.io/vps-setup/",
+    tech: ["bash", "docker"],
+    links: [{ type: "github", url: "https://github.com/idk-mr4tyunjay/vps-setup" }],
   },
   {
     name: "Multi-Window",
@@ -25,5 +29,6 @@ export const PROJECTS: Project[] = [
     year: "2024",
     url: "https://multi-window-xd.vercel.app/",
     tech: ["three.js"],
+    links: [{ type: "github", url: SITE.github }],
   },
 ];

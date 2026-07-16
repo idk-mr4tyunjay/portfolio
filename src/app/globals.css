@@ -18,12 +18,52 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+    scrollbar-color: var(--color-hairline) transparent;
+  }
+
   html,
   body {
     background: var(--color-bg);
     color: var(--color-fg);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The nav backdrop bleeds to 50vw; keep scrollbar-width overshoot from scrolling */
+  body {
+    overflow-x: clip;
+  }
+
+  /* Anchored sections clear the sticky nav (~60px) plus breathing room */
+  [id] {
+    scroll-margin-top: 72px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-hairline);
+    border-radius: 5px;
+    border: 3px solid var(--color-bg);
+  }
+
+  kbd {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    margin: 0 2px;
+    border: 1px solid var(--color-hairline);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    background: var(--color-bg-raised);
   }
 
   /*
@@ -137,7 +177,8 @@
     border-radius: 8px;
     transition: background 0.25s;
   }
-  .work-row:hover {
+  .work-row:hover,
+  .work-row:active {
     background: var(--color-bg-raised);
   }
   .work-row .work-name {
@@ -145,6 +186,28 @@
   }
   .work-row:hover .work-name {
     color: var(--color-accent);
+  }
+  /* Row number joins the hover moment */
+  .work-num {
+    color: var(--color-fg-muted);
+    transition: color 0.2s;
+  }
+  .work-row:hover .work-num {
+    color: var(--color-accent);
+  }
+
+  /* Note rows carry a left rule, like the margin line in a notebook */
+  .note-row {
+    border-left: 2px solid var(--color-hairline);
+    border-radius: 0 8px 8px 0;
+    padding-left: 10px;
+    transition:
+      background 0.25s,
+      border-color 0.25s;
+  }
+  .note-row:hover,
+  .note-row:active {
+    border-left-color: var(--color-accent);
   }
   /* Entry link icons (globe, X, Product Hunt) — subtle lift on hover */
   .entry-icon {
@@ -176,6 +239,37 @@
   .chip-btn:hover {
     color: var(--color-fg-secondary);
     border-color: var(--color-fg-muted);
+  }
+
+  /* Sticky nav — hides on scroll down, returns on scroll up (Nav.tsx) */
+  /* Margin keeps the resting offset; only the padded box pins, so the bar stays slim */
+  .nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    margin-top: 20px;
+    padding-top: 12px;
+    padding-bottom: 10px;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* Full-bleed blurred backdrop, visible only once content scrolls under */
+  .nav-bar::before {
+    content: "";
+    position: absolute;
+    inset: 0 calc(50% - 50vw);
+    z-index: -1;
+    background: color-mix(in srgb, var(--color-bg) 82%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--color-hairline);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .nav-bar.nav-scrolled::before {
+    opacity: 1;
+  }
+  .nav-bar.nav-hidden {
+    transform: translateY(-101%);
   }
 
   /* Nav links — underline reveals from the left on hover */
@@ -299,5 +393,15 @@
     border: none;
     border-top: 1px solid var(--color-hairline);
     margin: 2em 0;
+  }
+  /* End-of-article mark */
+  .note-prose::after {
+    content: "";
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    margin: 2.5em auto 0;
   }
 }

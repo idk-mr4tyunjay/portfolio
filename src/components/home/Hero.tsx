@@ -1,7 +1,7 @@
 import { SITE } from "@/data/site";
 
 const INTRO =
-  "I build fast, honest things for the web, and write down everything that breaks along the way.";
+  "I build fast, honest things for the web, and write down what I find interesting and what breaks along the way.";
 
 /*
   Hero.

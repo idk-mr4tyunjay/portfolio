@@ -1,5 +1,6 @@
 import type { EntryLink } from "@/types";
 import { Icon } from "@/components/icons";
+import { SectionLabel } from "./SectionLabel";
 
 /*
   Reusable list section. Shared by Work Experience and Side
@@ -20,6 +21,7 @@ export interface ListEntry {
 }
 
 const LINK_LABEL: Record<EntryLink["type"], string> = {
+  github: "GitHub",
   x: "X",
   producthunt: "Product Hunt",
 };
@@ -35,18 +37,14 @@ export function EntryList({
 }) {
   return (
     <section id={id} aria-label={label} className="pb-20">
-      <p
-        className="fade-up mb-3 text-xs"
-        style={{
-          fontFamily: "var(--font-mono)",
-          color: "var(--color-fg-muted)",
-          animationDelay: "0.25s",
-        }}
-      >
-        {label}
-      </p>
+      <SectionLabel delay="0.25s">{label}</SectionLabel>
       <ul style={{ borderTop: "1px solid var(--color-hairline)" }}>
-        {entries.map((entry, index) => (
+        {entries.map((entry, index) => {
+          // Whole row links to the live site, or GitHub when nothing is live
+          const primary =
+            entry.url ??
+            entry.links?.find((link) => link.type === "github")?.url;
+          return (
           <li
             key={entry.title}
             className="fade-up"
@@ -55,20 +53,28 @@ export function EntryList({
               animationDelay: `${0.3 + index * 0.06}s`,
             }}
           >
-            <div className="work-row block py-1">
+            <div className="work-row relative block py-1">
               <div className="flex items-baseline gap-4">
                 <span
                   aria-hidden
-                  className="text-xs"
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    color: "var(--color-fg-muted)",
-                  }}
+                  className="work-num text-xs"
+                  style={{ fontFamily: "var(--font-mono)" }}
                 >
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <span className="flex-1 text-[17px] font-medium">
-                  {entry.title}
+                  {primary ? (
+                    <a
+                      href={primary}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="work-name after:absolute after:inset-0"
+                    >
+                      {entry.title}
+                    </a>
+                  ) : (
+                    <span className="work-name">{entry.title}</span>
+                  )}
                 </span>
                 <span
                   className="text-xs whitespace-nowrap"
@@ -80,7 +86,7 @@ export function EntryList({
                   {entry.meta}
                 </span>
                 {(entry.url || entry.links?.length) && (
-                  <span className="flex items-center gap-2.5 self-center">
+                  <span className="relative flex items-center gap-2.5 self-center">
                     {entry.url && (
                       <a
                         href={entry.url}
@@ -126,7 +132,8 @@ export function EntryList({
               )}
             </div>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </section>
   );
