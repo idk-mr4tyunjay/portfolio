@@ -1,5 +1,5 @@
 /*
-  Contact + identity — SPEC.md §5.
+  Contact + identity.
 */
 
 export const SITE = {

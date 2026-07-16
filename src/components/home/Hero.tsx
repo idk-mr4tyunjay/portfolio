@@ -4,7 +4,7 @@ const INTRO =
   "I build fast, honest things for the web, and write down everything that breaks along the way.";
 
 /*
-  Hero — SPEC.md §4.
+  Hero.
   Name, role line, and a one-paragraph summary. The summary <p> stays in the
   DOM as the source of truth for the intro copy (screen readers / Ctrl-F / SEO).
 */
@@ -62,7 +62,7 @@ export function Hero() {
           animationDelay: "0.6s",
         }}
       >
-        scroll ↓
+        <span className="scroll-cue">scroll ↓</span>
       </p>
     </section>
   );

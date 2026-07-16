@@ -3,14 +3,14 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Atmosphere dot field — SPEC.md §3. A fixed, full-viewport canvas draws the
+ * Atmosphere dot field. A fixed, full-viewport canvas draws the
  * background grid. Marks near the pointer bloom from a dot into a small "+" and
  * brighten; everything else rests as a faint dot. A mark is just a "+" whose
  * arms grow — so the morph is one primitive, not two.
  *
  * The appearance is a pure function of pointer distance, so the canvas only
  * redraws while the pointer moves (rAF-coalesced) and goes idle when it stops —
- * zero idle work, like the hero. Coarse pointer / reduced motion → a static
+ * zero idle work. Coarse pointer / reduced motion → a static
  * dot grid, no listeners.
  */
 export function DotField() {

@@ -5,7 +5,7 @@ import { marked } from "marked";
 import type { NoteMeta } from "@/types";
 
 /*
-  Notes pipeline — SPEC.md §9. The repo is the CMS:
+  Notes pipeline. The repo is the CMS:
   drop a markdown file with frontmatter into content/notes/ and it ships.
   Server-only (fs) — everything renders at build time, zero client cost.
 */

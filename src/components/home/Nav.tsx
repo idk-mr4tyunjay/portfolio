@@ -14,16 +14,16 @@ export function Nav() {
         mj
       </Link>
       <div className="flex gap-6 text-[13px]">
-        <Link href="/#work" className="quiet-link">
+        <Link href="/#work" className="quiet-link nav-link">
           work
         </Link>
-        <Link href="/#projects" className="quiet-link">
+        <Link href="/#projects" className="quiet-link nav-link">
           projects
         </Link>
-        <Link href="/notes" className="quiet-link">
+        <Link href="/notes" className="quiet-link nav-link">
           notes
         </Link>
-        <Link href="/#contact" className="quiet-link">
+        <Link href="/#contact" className="quiet-link nav-link">
           contact
         </Link>
       </div>

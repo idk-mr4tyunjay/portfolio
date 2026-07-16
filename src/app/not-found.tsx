@@ -38,11 +38,11 @@ export default function NotFound() {
           className="fade-up mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-[15px]"
           style={{ animationDelay: "0.15s" }}
         >
-          <Link href="/" className="quiet-link" style={{ color: "var(--color-accent)" }}>
-            go home →
+          <Link href="/" className="quiet-link arrow-link" style={{ color: "var(--color-accent)" }}>
+            go home <span className="arrow">→</span>
           </Link>
-          <Link href="/notes" className="quiet-link" style={{ color: "var(--color-accent)" }}>
-            read the notes →
+          <Link href="/notes" className="quiet-link arrow-link" style={{ color: "var(--color-accent)" }}>
+            read the notes <span className="arrow">→</span>
           </Link>
         </p>
       </main>

@@ -1,5 +1,5 @@
 /*
-  Canonical types — SPEC.md §5.
+  Canonical types.
 */
 
 export interface NoteMeta {

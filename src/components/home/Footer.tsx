@@ -33,19 +33,19 @@ export function Footer() {
           href={SITE.linkedin}
           target="_blank"
           rel="noreferrer"
-          className="quiet-link"
+          className="quiet-link arrow-link diag"
           style={{ color: "var(--color-accent)" }}
         >
-          linkedin ↗
+          linkedin <span className="arrow">↗</span>
         </a>
         <a
           href={SITE.github}
           target="_blank"
           rel="noreferrer"
-          className="quiet-link"
+          className="quiet-link arrow-link diag"
           style={{ color: "var(--color-accent)" }}
         >
-          github ↗
+          github <span className="arrow">↗</span>
         </a>
       </p>
 
