@@ -9,8 +9,9 @@
   --color-bg: #0a0a0b;
   --color-bg-raised: #121214;
   --color-fg: #f2f2f4;
-  --color-fg-secondary: #8a8a90;
-  --color-fg-muted: #6b6b70;
+  --color-fg-body: #cdced3;
+  --color-fg-secondary: #b4b4ba;
+  --color-fg-muted: #98989f;
   --color-hairline: #1e1e20;
   --color-accent: #7cf6ff;
   --color-ok: #4ade80;
@@ -145,17 +146,22 @@
   .work-row:hover .work-name {
     color: var(--color-accent);
   }
-  .work-row .work-arrow {
-    display: inline-block;
-    transition: transform 0.3s cubic-bezier(0.22, 1.4, 0.36, 1);
+  /* Entry link icons (globe, X, Product Hunt) — subtle lift on hover */
+  .entry-icon {
+    display: inline-flex;
+    opacity: 0.85;
+    transition:
+      opacity 0.2s,
+      transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .work-row:hover .work-arrow {
-    transform: translate(3px, -3px);
+  .entry-icon:hover {
+    opacity: 1;
+    transform: translateY(-2px);
   }
 
   .chip {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1;
     color: var(--color-fg-muted);
     border: 1px solid var(--color-hairline);
@@ -176,11 +182,12 @@
   .nav-link {
     position: relative;
   }
+  /* Links carry py-2 for tap area; 5px keeps the line 3px under the text */
   .nav-link::after {
     content: "";
     position: absolute;
     left: 0;
-    bottom: -3px;
+    bottom: 5px;
     width: 100%;
     height: 1px;
     background: var(--color-fg);
@@ -220,21 +227,21 @@
 
   /* Rendered markdown */
   .note-prose {
-    color: var(--color-fg-secondary);
+    color: var(--color-fg-body);
     font-size: 15.5px;
     line-height: 1.75;
   }
   .note-prose h2 {
     color: var(--color-fg);
     font-size: 20px;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: -0.01em;
     margin: 2.2em 0 0.6em;
   }
   .note-prose h3 {
     color: var(--color-fg);
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 600;
     margin: 1.8em 0 0.5em;
   }
   .note-prose p {

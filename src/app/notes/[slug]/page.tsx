@@ -85,7 +85,7 @@ export default async function NotePage({
             className="mt-6 mb-3"
             style={{
               fontSize: "clamp(28px, 4.5vw, 40px)",
-              fontWeight: 500,
+              fontWeight: 600,
               letterSpacing: "-0.02em",
               lineHeight: 1.15,
             }}

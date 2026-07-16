@@ -1,3 +1,6 @@
+import type { EntryLink } from "@/types";
+import { Icon } from "@/components/icons";
+
 /*
   Reusable list section. Shared by Work Experience and Side
   Projects; keeps the numbered-row layout in one place. Content-free: callers
@@ -9,10 +12,17 @@ export interface ListEntry {
   /** Right-aligned mono meta: a year or a period. */
   meta: string;
   description: string;
-  /** External URL — row renders ↗ and links when present. */
+  /** Primary site — rendered as a globe icon link when present. */
   url?: string;
   tags?: string[];
+  /** Extra platform links (X, Product Hunt) rendered as icons. */
+  links?: EntryLink[];
 }
+
+const LINK_LABEL: Record<EntryLink["type"], string> = {
+  x: "X",
+  producthunt: "Product Hunt",
+};
 
 export function EntryList({
   id,
@@ -36,10 +46,17 @@ export function EntryList({
         {label}
       </p>
       <ul style={{ borderTop: "1px solid var(--color-hairline)" }}>
-        {entries.map((entry, index) => {
-          const row = (
-            <span className="work-row block">
-              <span className="flex items-baseline gap-4">
+        {entries.map((entry, index) => (
+          <li
+            key={entry.title}
+            className="fade-up"
+            style={{
+              borderBottom: "1px solid var(--color-hairline)",
+              animationDelay: `${0.3 + index * 0.06}s`,
+            }}
+          >
+            <div className="work-row block py-1">
+              <div className="flex items-baseline gap-4">
                 <span
                   aria-hidden
                   className="text-xs"
@@ -50,11 +67,11 @@ export function EntryList({
                 >
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                <span className="work-name flex-1 text-[17px] font-medium">
+                <span className="flex-1 text-[17px] font-medium">
                   {entry.title}
                 </span>
                 <span
-                  className="text-xs"
+                  className="text-xs whitespace-nowrap"
                   style={{
                     fontFamily: "var(--font-mono)",
                     color: "var(--color-fg-muted)",
@@ -62,58 +79,54 @@ export function EntryList({
                 >
                   {entry.meta}
                 </span>
-                {entry.url && (
-                  <span
-                    aria-hidden
-                    className="work-arrow text-[13px]"
-                    style={{ color: "var(--color-accent)" }}
-                  >
-                    ↗
+                {(entry.url || entry.links?.length) && (
+                  <span className="flex items-center gap-2.5 self-center">
+                    {entry.url && (
+                      <a
+                        href={entry.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={`${entry.title} website`}
+                        className="entry-icon"
+                        style={{ color: "var(--color-accent)" }}
+                      >
+                        <Icon type="web" />
+                      </a>
+                    )}
+                    {entry.links?.map((link) => (
+                      <a
+                        key={link.url}
+                        href={link.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={`${entry.title} on ${LINK_LABEL[link.type]}`}
+                        className="entry-icon"
+                        style={{ color: "var(--color-accent)" }}
+                      >
+                        <Icon type={link.type} />
+                      </a>
+                    ))}
                   </span>
                 )}
-              </span>
-              <span
-                className="mt-1 block pl-9 text-[13.5px] leading-relaxed"
-                style={{ color: "var(--color-fg-secondary)" }}
+              </div>
+              <p
+                className="mt-1 text-[13.5px] leading-relaxed sm:pl-9"
+                style={{ color: "var(--color-fg-body)" }}
               >
                 {entry.description}
-              </span>
+              </p>
               {entry.tags && entry.tags.length > 0 && (
-                <span className="mt-3 flex flex-wrap gap-1.5 pl-9">
+                <div className="mt-3 flex flex-wrap gap-1.5 sm:pl-9">
                   {entry.tags.map((tag) => (
                     <span key={tag} className="chip">
                       {tag}
                     </span>
                   ))}
-                </span>
+                </div>
               )}
-            </span>
-          );
-
-          return (
-            <li
-              key={entry.title}
-              className="fade-up"
-              style={{
-                borderBottom: "1px solid var(--color-hairline)",
-                animationDelay: `${0.3 + index * 0.06}s`,
-              }}
-            >
-              {entry.url ? (
-                <a
-                  href={entry.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block py-1"
-                >
-                  {row}
-                </a>
-              ) : (
-                <span className="block py-1">{row}</span>
-              )}
-            </li>
-          );
-        })}
+            </div>
+          </li>
+        ))}
       </ul>
     </section>
   );

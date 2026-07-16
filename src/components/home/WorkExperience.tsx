@@ -12,6 +12,7 @@ export function WorkExperience() {
         description: e.description,
         url: e.url,
         tags: e.tech,
+        links: e.links,
       }))}
     />
   );

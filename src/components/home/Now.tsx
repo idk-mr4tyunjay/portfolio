@@ -15,7 +15,7 @@ export function Now() {
       </p>
       <p
         className="fade-up max-w-[52ch] text-[15px] leading-relaxed"
-        style={{ color: "var(--color-fg-secondary)", animationDelay: "0.25s" }}
+        style={{ color: "var(--color-fg-body)", animationDelay: "0.25s" }}
       >
         {SITE.now}
       </p>

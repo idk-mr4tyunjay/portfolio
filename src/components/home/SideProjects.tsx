@@ -12,6 +12,7 @@ export function SideProjects() {
         description: p.description,
         url: p.url,
         tags: p.tech,
+        links: p.links,
       }))}
     />
   );

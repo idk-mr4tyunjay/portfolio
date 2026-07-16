@@ -13,23 +13,28 @@ export const EXPERIENCE: Experience[] = [
       "Building real-time cross-border payments on stablecoin rails, where sending money is as simple as a name or an email and it settles instantly.",
     url: "https://payflip.xyz",
     tech: ["stablecoins"],
+    links: [{ type: "x", url: "https://x.com/payflipxyz" }],
   },
   {
     role: "Engineer",
     company: "ContextPool",
-    period: "2025 – present",
+    period: "2026",
     description:
-      "Building persistent memory for AI coding agents over MCP, so tools like Cursor keep what they learned last session instead of relearning the codebase every time.",
+      "Built persistent memory for AI coding agents over MCP, so tools like Cursor keep what they learned last session instead of relearning the codebase every time.",
     url: "https://www.contextpool.io/",
     tech: ["mcp", "cli"],
+    links: [
+      { type: "producthunt", url: "https://www.producthunt.com/products/contextpool" },
+    ],
   },
   {
     role: "Engineer",
     company: "SurgeDeFi",
-    period: "2025 – present",
+    period: "2025",
     description:
-      "Building DeFi infrastructure for emerging EVM chains, live on XRPL-EVM mainnet.",
+      "Built DeFi infrastructure for emerging EVM chains, live on XRPL-EVM mainnet.",
     url: "https://app.surgedefi.com",
     tech: ["solidity", "evm"],
+    links: [{ type: "x", url: "https://x.com/Surgedefi_hq" }],
   },
 ];
