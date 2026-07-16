@@ -2,7 +2,8 @@ import { Nav } from "@/components/home/Nav";
 import { Hero } from "@/components/home/Hero";
 import { Now } from "@/components/home/Now";
 import { About } from "@/components/home/About";
-import { WorkList } from "@/components/home/WorkList";
+import { WorkExperience } from "@/components/home/WorkExperience";
+import { SideProjects } from "@/components/home/SideProjects";
 import { NotesPreview } from "@/components/home/NotesPreview";
 import { Footer } from "@/components/home/Footer";
 import { JsonLd } from "@/components/JsonLd";
@@ -35,7 +36,8 @@ export default function Home() {
         <Hero />
         <Now />
         <About />
-        <WorkList />
+        <WorkExperience />
+        <SideProjects />
         <NotesPreview />
       </main>
       <Footer />
