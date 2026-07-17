@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { fontVariables } from "@/lib/fonts";
+import { Analytics } from "@/components/Analytics";
 import { CommandPalette } from "@/components/home/CommandPalette";
 import { DotField } from "@/components/home/DotField";
 import { SITE } from "@/data/site";
@@ -85,6 +86,7 @@ export default function RootLayout({
         {/* Above the body::before/::after atmosphere layers */}
         <div className="relative z-10">{children}</div>
         <CommandPalette />
+        <Analytics />
       </body>
     </html>
   );
