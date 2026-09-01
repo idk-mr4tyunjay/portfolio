@@ -243,10 +243,12 @@
     color: var(--color-fg);
   }
 
-  /* Work-index accordion rows — hover tints the whole row and nudges text in */
+  /* Work-index accordion rows — hover tints the whole row edge-to-edge and nudges text in */
   .case-row {
     cursor: pointer;
     color: var(--color-fg);
+    margin-inline: -20px;
+    padding-inline: 20px;
     transition:
       background 0.35s cubic-bezier(0.22, 1, 0.36, 1),
       color 0.35s ease,
@@ -256,6 +258,12 @@
     background: var(--color-panel);
     color: var(--color-panel-fg);
     padding-left: 40px;
+  }
+  @media (min-width: 640px) {
+    .case-row {
+      margin-inline: -30px;
+      padding-inline: 30px;
+    }
   }
   .case-plus {
     transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { CASE_STUDIES } from "@/data/experience";
+import type { CaseStudy } from "@/types";
 import { ImagePlaceholder } from "./ImagePlaceholder";
 import { SectionHeader } from "./SectionHeader";
 
@@ -21,9 +22,11 @@ export function WorkIndex() {
     visible: false,
   });
   const peekLabel = useRef("");
+  const peekSrc = useRef<string | undefined>(undefined);
 
-  const move = (e: React.MouseEvent, label: string) => {
-    peekLabel.current = label;
+  const move = (e: React.MouseEvent, cs: CaseStudy) => {
+    peekLabel.current = cs.name;
+    peekSrc.current = cs.images?.[0]?.src ?? cs.products?.[0]?.image?.src;
     setPeek({ x: e.clientX + 150, y: e.clientY, visible: true });
   };
   const leave = () => setPeek((p) => ({ ...p, visible: false }));
@@ -47,7 +50,7 @@ export function WorkIndex() {
           transform: `translate(-50%, -50%) scale(${peek.visible ? 1 : 0.94})`,
         }}
       >
-        <ImagePlaceholder caption={`${peekLabel.current} · screenshot`} />
+        <ImagePlaceholder caption={`${peekLabel.current} · screenshot`} src={peekSrc.current} />
       </div>
 
       <div style={{ borderTop: "1px solid var(--color-hairline)" }}>
@@ -71,28 +74,41 @@ export function WorkIndex() {
                     setOpen(isOpen ? null : cs.name);
                   }
                 }}
-                onMouseEnter={(e) => !isOpen && move(e, cs.name)}
-                onMouseMove={(e) => !isOpen && move(e, cs.name)}
+                onMouseEnter={(e) => !isOpen && move(e, cs)}
+                onMouseMove={(e) => !isOpen && move(e, cs)}
                 onMouseLeave={leave}
-                className="case-row grid grid-cols-[36px_1fr] items-center gap-4 py-5 sm:grid-cols-[64px_minmax(0,1.5fr)_minmax(0,1.6fr)_132px] sm:gap-6 sm:px-0"
+                className="case-row grid grid-cols-[36px_1fr] items-center gap-4 py-5 sm:grid-cols-[64px_minmax(0,1.5fr)_minmax(0,1.6fr)_132px] sm:gap-6"
               >
-                <span className="text-[11px] opacity-50" style={{ fontFamily: "var(--font-mono)" }}>
+                <span className="text-[11px] font-medium opacity-65" style={{ fontFamily: "var(--font-mono)" }}>
                   {cs.num}
                 </span>
                 <span className="font-semibold" style={{ fontSize: "clamp(26px,3.8vw,52px)", lineHeight: 1, letterSpacing: "-0.035em" }}>
                   {cs.name}
                 </span>
                 <span className="col-span-2 flex flex-col gap-1.5 sm:col-span-1">
-                  <span className="text-[10.5px] tracking-[0.16em] uppercase opacity-55" style={{ fontFamily: "var(--font-mono)" }}>
+                  <span className="text-[10.5px] font-medium tracking-[0.16em] uppercase opacity-65" style={{ fontFamily: "var(--font-mono)" }}>
                     {cs.tagsLine}
                   </span>
+                  {cs.products && (
+                    <span className="flex flex-wrap gap-x-2 gap-y-1">
+                      {cs.products.map((product) => (
+                        <span
+                          key={product.name}
+                          className="text-[9.5px] tracking-[0.1em] uppercase"
+                          style={{ fontFamily: "var(--font-mono)", color: "var(--color-accent)" }}
+                        >
+                          {product.name}
+                        </span>
+                      ))}
+                    </span>
+                  )}
                   <span className="max-w-[48ch] text-[14.5px] leading-relaxed text-pretty opacity-70">{cs.summary}</span>
                 </span>
                 <span className="col-span-2 flex flex-row items-center justify-between gap-2 sm:col-span-1 sm:flex-col sm:items-end">
-                  <span className="text-[11px] opacity-60" style={{ fontFamily: "var(--font-mono)" }}>
+                  <span className="text-[11px] font-medium opacity-65" style={{ fontFamily: "var(--font-mono)" }}>
                     {cs.period}
                   </span>
-                  <span className="inline-flex items-center gap-1.5 text-[9.5px] tracking-[0.16em] opacity-55" style={{ fontFamily: "var(--font-mono)" }}>
+                  <span className="inline-flex items-center gap-1.5 text-[9.5px] font-medium tracking-[0.16em] opacity-65" style={{ fontFamily: "var(--font-mono)" }}>
                     <span>case study</span>
                     <span
                       aria-hidden
@@ -186,10 +202,25 @@ export function WorkIndex() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-3">
-                    {cs.images.map((image) => (
-                      <ImagePlaceholder key={image.id} caption={image.placeholder} />
-                    ))}
+                  <div className="flex flex-col gap-5">
+                    {cs.products
+                      ? cs.products.map((product) => (
+                          <div key={product.name} className="flex flex-col gap-2">
+                            <span
+                              className="text-[9.5px] font-medium tracking-[0.16em] uppercase opacity-65"
+                              style={{ fontFamily: "var(--font-mono)" }}
+                            >
+                              {product.name}
+                            </span>
+                            <ImagePlaceholder
+                              caption={product.image?.placeholder ?? `${product.name} · screenshot`}
+                              src={product.image?.src}
+                            />
+                          </div>
+                        ))
+                      : cs.images?.map((image) => (
+                          <ImagePlaceholder key={image.id} caption={image.placeholder} src={image.src} />
+                        ))}
                   </div>
                 </div>
               </div>

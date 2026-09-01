@@ -1,15 +1,29 @@
+import Image from "next/image";
+
 /*
-  Stand-in for a real screenshot. Same visual language as the design
-  (swatch fill, hatched rail pattern, mono caption) so screenshots can be
-  dropped in later by swapping this for a next/image without touching layout.
+  Case-study screenshot slot. Renders the real screenshot via next/image when
+  `src` is set; otherwise falls back to a swatch + hatched rail pattern with a
+  mono caption as a stand-in until one is added.
 */
 export function ImagePlaceholder({
   caption,
+  src,
   className = "",
 }: {
   caption: string;
+  src?: string;
   className?: string;
 }) {
+  if (src) {
+    return (
+      <div
+        className={`relative aspect-video overflow-hidden border [border-color:var(--color-hairline)] ${className}`}
+      >
+        <Image src={src} alt={caption} fill sizes="(min-width: 640px) 50vw, 100vw" className="object-cover object-top" />
+      </div>
+    );
+  }
+
   return (
     <div
       className={`relative flex aspect-video items-end border p-3 [border-color:var(--color-hairline)] ${className}`}

@@ -23,14 +23,21 @@ export const CASE_STUDIES: CaseStudy[] = [
       },
       { text: "Own the release pipeline: builds, crash reporting, and the 2am fixes." },
     ],
-    chips: ["settles · instant", "rails · stablecoin", "ios · in review"],
+    chips: ["settles · instant", "rails · stablecoin"],
     links: [
       { label: "payflip.xyz ↗", url: "https://payflip.xyz" },
+      { label: "app store ↗", url: "https://apps.apple.com/us/app/payflip/id6763750346" },
       { label: "google play ↗", url: "https://play.google.com/store/apps/details?id=xyz.payflip.app" },
       { label: "github ↗", url: "https://github.com/payflip-labs" },
       { label: "x ↗", url: "https://x.com/payflipxyz" },
     ],
-    images: [{ id: "case-payflip", placeholder: "payflip.xyz · app screenshot" }],
+    images: [
+      {
+        id: "case-payflip",
+        placeholder: "payflip.xyz · app screenshot",
+        src: "/images/case-studies/case-payflip.png",
+      },
+    ],
   },
   {
     num: "02",
@@ -38,7 +45,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     tagsLine: "engineer · solidity · mcp · next.js",
     summary:
       "One team, three products: DeFi infrastructure for emerging chains, plus two developer tools that came out of our own pain.",
-    period: "2025 – 2026",
+    period: "2024 – 2026",
     brief:
       "Ship DeFi infrastructure where the chains are new and the tooling isn't there yet, then fix the tools we wished existed while doing it.",
     products: [
@@ -46,28 +53,39 @@ export const CASE_STUDIES: CaseStudy[] = [
         name: "SurgeDeFi",
         description: "DeFi infra for emerging EVM chains, live on XRPL-EVM mainnet.",
         year: "2025",
+        image: {
+          placeholder: "app.surgedefi.com · screenshot",
+          src: "/images/case-studies/case-surgedefi.png",
+        },
       },
       {
         name: "ContextPool",
         description: "Persistent memory for AI coding agents over MCP. #3 on Product Hunt.",
         year: "apr 2026",
+        image: {
+          placeholder: "contextpool.io · screenshot",
+          src: "/images/case-studies/case-contextpool.png",
+        },
       },
       {
         name: "FixMyAI",
         description: "Your AI wrote the code. We make it work.",
         year: "may 2026",
+        image: {
+          placeholder: "fixmyai.dev · screenshot",
+          src: "/images/case-studies/case-fixmyai.png",
+        },
       },
     ],
     chips: ["#3 product hunt", "xrpl-evm mainnet"],
     links: [
       { label: "contextpool ↗", url: "https://www.contextpool.io/" },
+      { label: "contextpool · github ↗", url: "https://github.com/syv-labs/contextpool" },
+      { label: "contextpool · product hunt ↗", url: "https://www.producthunt.com/products/contextpool" },
       { label: "surgedefi ↗", url: "https://app.surgedefi.com" },
-      { label: "github ↗", url: "https://github.com/syv-labs" },
-      { label: "product hunt ↗", url: "https://www.producthunt.com/@idk_mr4tyunjay" },
-    ],
-    images: [
-      { id: "case-contextpool", placeholder: "contextpool.io · screenshot" },
-      { id: "case-surge", placeholder: "surgedefi · screenshot (later)" },
+      { label: "surgedefi · github ↗", url: "https://github.com/syv-labs" },
+      { label: "surgedefi · x ↗", url: "https://x.com/Surgedefi_hq" },
+      { label: "fixmyai ↗", url: "https://fixmyai.dev" },
     ],
   },
   {
@@ -76,18 +94,24 @@ export const CASE_STUDIES: CaseStudy[] = [
     tagsLine: "engineer · tokenisation · evm",
     summary:
       "Blockchain product work, including BREX, which turned illiquid real-world assets into fractional, tradable units.",
-    period: "dates tbc",
+    period: "2023 – 2024",
     brief:
       "Real estate, gold and private equity are assets most people can't touch. BREX tokenised them, splitting one high-value asset into units small enough to actually buy.",
     whatIDid: [
-      { text: "your scope here: contracts, frontend, integrations, whichever it was.", placeholder: true },
-      { text: "the hardest problem you solved there, in one line.", placeholder: true },
+      { text: "Integrated the EVM contracts that split a single real estate, gold, or equity asset into fractional, tradable units." },
+      { text: "Built the investor-facing flows for browsing assets, buying in, and tracking a portfolio across all three asset types." },
     ],
-    chips: ["brex · no longer live"],
+    chips: ["real estate · gold · equity", "brex · no longer live"],
     links: [
       { label: "github ↗", url: "https://github.com/bharatbz" },
       { label: "brex ↗", url: "https://www.linkedin.com/company/brexvc/" },
     ],
-    images: [{ id: "case-brex", placeholder: "brex · screenshot or archive shot" }],
+    images: [
+      {
+        id: "case-brex",
+        placeholder: "brex.vc · archived screenshot",
+        src: "/images/case-studies/case-brex.webp",
+      },
+    ],
   },
 ];
