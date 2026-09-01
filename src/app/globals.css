@@ -135,6 +135,12 @@
     }
   }
 
+  /* Shows the hero intro loader from the very first paint (layout.tsx's blocking script sets this) — avoids a flash of page content before it. */
+  html[data-show-intro] .intro-overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   /* Entrance — killed by the reduced-motion block above */
   @keyframes fade-up {
     from {
@@ -158,7 +164,7 @@
 
   @keyframes letter-up {
     from {
-      transform: translateY(118%) rotate(6deg);
+      transform: translateY(140%) rotate(6deg);
     }
     to {
       transform: translateY(0) rotate(0);
