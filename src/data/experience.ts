@@ -23,9 +23,10 @@ export const CASE_STUDIES: CaseStudy[] = [
       },
       { text: "Own the release pipeline: builds, crash reporting, and the 2am fixes." },
     ],
-    chips: ["settles · instant", "rails · stablecoin"],
+    chips: ["settles · instant", "rails · stablecoin", "ios · in review"],
     links: [
       { label: "payflip.xyz ↗", url: "https://payflip.xyz" },
+      { label: "google play ↗", url: "https://play.google.com/store/apps/details?id=xyz.payflip.app" },
       { label: "github ↗", url: "https://github.com/payflip-labs" },
       { label: "x ↗", url: "https://x.com/payflipxyz" },
     ],
