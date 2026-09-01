@@ -9,6 +9,9 @@ import "./globals.css";
 // Applied before hydration so a stored dark preference never flashes light.
 const THEME_SCRIPT = `try{if(localStorage.getItem("mj-theme")==="dark")document.documentElement.dataset.theme="dark"}catch(e){}`;
 
+// Decides the hero intro loader before first paint, so it's never a beat behind (Hero.tsx reads this).
+const INTRO_SCRIPT = `try{if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches&&!sessionStorage.getItem("mj-intro")){sessionStorage.setItem("mj-intro","1");document.documentElement.setAttribute("data-show-intro","")}}catch(e){}`;
+
 const TITLE = `${SITE.name} · ${SITE.role}`;
 
 export const metadata: Metadata = {
@@ -82,9 +85,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={fontVariables}>
+    <html lang="en" className={fontVariables} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
       </head>
       <body
         className="antialiased"

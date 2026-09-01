@@ -36,11 +36,19 @@ export interface CaseStudyBullet {
   placeholder?: boolean;
 }
 
+/** A case-study screenshot slot — real image once `src` is set, placeholder until then. */
+export interface CaseStudyImage {
+  placeholder: string;
+  src?: string;
+}
+
 /** One row of a multi-product case study (see CaseStudy.products). */
 export interface CaseStudyProduct {
   name: string;
   description: string;
   year: string;
+  /** Its own screenshot, shown alongside this product in the expanded panel */
+  image?: CaseStudyImage;
 }
 
 /** Plain text link, e.g. "payflip.xyz ↗" — case studies list these inline, not as icons. */
@@ -65,6 +73,9 @@ export interface CaseStudy {
   products?: CaseStudyProduct[];
   chips: string[];
   links: CaseStudyLink[];
-  /** One image, or two stacked (a multi-product case study) */
-  images: { id: string; placeholder: string }[];
+  /**
+   * Screenshot(s) for a single-product case study. A multi-product case
+   * study (has `products`) carries its screenshots on each product instead.
+   */
+  images?: (CaseStudyImage & { id: string })[];
 }

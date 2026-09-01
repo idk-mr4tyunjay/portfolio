@@ -37,7 +37,7 @@ export function Contact() {
           className="quiet-link flex items-baseline gap-2.5 self-start font-semibold"
           style={{ fontSize: "clamp(22px,2.8vw,38px)", letterSpacing: "-0.03em", borderBottom: "1px solid var(--color-hairline)", paddingBottom: "8px" }}
         >
-          {SITE.email} <span style={{ fontSize: "0.5em" }}>↗</span>
+          send an email <span style={{ fontSize: "0.5em" }}>↗</span>
         </a>
         <div className="flex flex-col items-start gap-2 text-[11px] tracking-[0.16em] uppercase" style={{ fontFamily: "var(--font-mono)" }}>
           <a href={SITE.github} target="_blank" rel="noreferrer" className="quiet-link">

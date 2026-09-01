@@ -132,7 +132,7 @@ export function NotesIndex({ notes }: { notes: NoteMeta[] }) {
                 </span>
               ))}
             </span>
-            <span className="justify-self-end text-[13px] opacity-50 sm:justify-self-auto" style={{ fontFamily: "var(--font-mono)" }}>
+            <span className="justify-self-end text-[13px] opacity-65 sm:justify-self-auto" style={{ fontFamily: "var(--font-mono)" }}>
               →
             </span>
           </Link>

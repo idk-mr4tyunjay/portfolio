@@ -26,29 +26,17 @@ export function Hero() {
       ? Array.from(wordmarkRef.current.querySelectorAll<HTMLElement>("[data-letter]"))
       : [];
 
-    // Intro loader — once per session, and never under reduced motion.
+    // Intro loader — layout.tsx's blocking script already decided (and marked
+    // the session) before paint, so the overlay is never a beat behind.
     const overlay = introRef.current;
     if (overlay) {
-      let seen = true;
-      try {
-        seen = !!sessionStorage.getItem("mj-intro");
-      } catch {
-        // storage disabled — treat as "already seen" and skip the loader
-      }
-      const wanted = !reduced && !seen;
+      const wanted = document.documentElement.hasAttribute("data-show-intro");
       if (!wanted) {
         overlay.style.display = "none";
       } else {
-        try {
-          sessionStorage.setItem("mj-intro", "1");
-        } catch {
-          // best-effort only
-        }
         letters.forEach((l) => {
           l.style.animationPlayState = "paused";
         });
-        overlay.style.opacity = "1";
-        overlay.style.pointerEvents = "auto";
         const dur = 900;
         const t0 = performance.now();
         const step = (now: number) => {
@@ -67,6 +55,7 @@ export function Hero() {
           overlay.style.transform = "translateY(-101%)";
           setTimeout(() => {
             overlay.style.display = "none";
+            document.documentElement.removeAttribute("data-show-intro");
           }, 900);
         };
         requestAnimationFrame(step);
@@ -135,7 +124,7 @@ export function Hero() {
       <div
         ref={introRef}
         aria-hidden
-        className="pointer-events-none fixed inset-0 z-50 flex flex-col justify-end p-[30px] opacity-0"
+        className="intro-overlay pointer-events-none fixed inset-0 z-50 flex flex-col justify-end p-[30px] opacity-0"
         style={{ background: "var(--color-bg)", transition: "transform .85s cubic-bezier(.76,0,.24,1)" }}
       >
         <div className="flex items-end justify-between gap-6">
@@ -192,25 +181,25 @@ export function Hero() {
         </div>
 
         <div ref={heroRef} style={{ willChange: "transform", transformOrigin: "0 100%" }}>
-          <div className="overflow-hidden pb-[0.06em]">
-            <h1
-              ref={wordmarkRef}
-              className="m-0 cursor-default font-bold"
-              style={{ fontSize: "clamp(56px,15.5vw,272px)", lineHeight: 0.78, letterSpacing: "-0.055em" }}
-            >
-              {SITE.name.split("").map((letter, i) => (
-                <span key={i} className="inline-block" style={{ transition: "transform .6s cubic-bezier(.16,1,.3,1), color .4s ease" }}>
-                  <span
-                    data-letter="true"
-                    className="inline-block"
-                    style={{ animation: `letter-up 1.05s cubic-bezier(.16,1,.3,1) ${(0.05 * (i + 1)).toFixed(2)}s both` }}
-                  >
-                    {letter}
-                  </span>
+          {/* Mask for the letter-up entrance. pb is in em of the wordmark itself
+              so the 0.78 line-height still leaves room for j/y descenders. */}
+          <h1
+            ref={wordmarkRef}
+            className="m-0 cursor-default overflow-hidden pb-[0.18em] font-bold"
+            style={{ fontSize: "clamp(56px,15.5vw,272px)", lineHeight: 0.78, letterSpacing: "-0.055em" }}
+          >
+            {SITE.name.split("").map((letter, i) => (
+              <span key={i} className="inline-block" style={{ transition: "transform .6s cubic-bezier(.16,1,.3,1), color .4s ease" }}>
+                <span
+                  data-letter="true"
+                  className="inline-block"
+                  style={{ animation: `letter-up 1.05s cubic-bezier(.16,1,.3,1) ${(0.05 * (i + 1)).toFixed(2)}s both` }}
+                >
+                  {letter}
                 </span>
-              ))}
-            </h1>
-          </div>
+              </span>
+            ))}
+          </h1>
           <div className="relative mt-4 pt-[18px]">
             <span
               aria-hidden
