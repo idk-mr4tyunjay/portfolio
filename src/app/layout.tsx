@@ -2,9 +2,12 @@ import type { Metadata, Viewport } from "next";
 import { fontVariables } from "@/lib/fonts";
 import { Analytics } from "@/components/Analytics";
 import { CommandPalette } from "@/components/home/CommandPalette";
-import { DotField } from "@/components/home/DotField";
+import { SmoothScroll } from "@/components/home/SmoothScroll";
 import { SITE } from "@/data/site";
 import "./globals.css";
+
+// Applied before hydration so a stored dark preference never flashes light.
+const THEME_SCRIPT = `try{if(localStorage.getItem("mj-theme")==="dark")document.documentElement.dataset.theme="dark"}catch(e){}`;
 
 const TITLE = `${SITE.name} · ${SITE.role}`;
 
@@ -65,7 +68,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0b",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#e9e7e1" },
+    { media: "(prefers-color-scheme: dark)", color: "#111110" },
+  ],
   width: "device-width",
   initialScale: 1,
 };
@@ -77,13 +83,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={fontVariables}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body
         className="antialiased"
-        style={{ fontFamily: "var(--font-inter)" }}
+        style={{ fontFamily: "var(--font-archivo)" }}
       >
-        {/* Behind content (z-10), above the ::before glow */}
-        <DotField />
-        {/* Above the body::before/::after atmosphere layers */}
+        <SmoothScroll />
         <div className="relative z-10">{children}</div>
         <CommandPalette />
         <Analytics />

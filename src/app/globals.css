@@ -6,20 +6,51 @@
 */
 
 @theme {
-  --color-bg: #0a0a0b;
-  --color-bg-raised: #121214;
-  --color-fg: #f2f2f4;
-  --color-fg-body: #cdced3;
-  --color-fg-secondary: #b4b4ba;
-  --color-fg-muted: #98989f;
-  --color-hairline: #1e1e20;
-  --color-accent: #7cf6ff;
+  --color-bg: #e9e7e1;
+  --color-bg-raised: #e2dfd8;
+  --color-fg: #141413;
+  --color-fg-body: rgba(20, 20, 19, 0.72);
+  --color-fg-secondary: rgba(20, 20, 19, 0.6);
+  --color-fg-muted: rgba(20, 20, 19, 0.44);
+  --color-hairline: rgba(20, 20, 19, 0.22);
+  --color-rail: rgba(20, 20, 19, 0.055);
+  --color-accent: #c93c0a;
   --color-ok: #4ade80;
+  --color-panel: #141413;
+  --color-panel-fg: #e9e7e1;
+  --color-panel-fg-body: rgba(233, 231, 225, 0.66);
+  --color-panel-fg-muted: rgba(233, 231, 225, 0.44);
+  --color-panel-hairline: rgba(233, 231, 225, 0.18);
+  --color-panel-accent: #e8703f;
+  --color-swatch: #e2dfd8;
+  --grain-opacity: 0.3;
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #111110;
+  --color-bg-raised: #1b1b19;
+  --color-fg: #eceae2;
+  --color-fg-body: rgba(236, 234, 226, 0.72);
+  --color-fg-secondary: rgba(236, 234, 226, 0.58);
+  --color-fg-muted: rgba(236, 234, 226, 0.42);
+  --color-hairline: rgba(236, 234, 226, 0.28);
+  --color-rail: rgba(236, 234, 226, 0.05);
+  --color-accent: #f0713d;
+  --color-panel: #eceae2;
+  --color-panel-fg: #141413;
+  --color-panel-fg-body: rgba(20, 20, 19, 0.68);
+  --color-panel-fg-muted: rgba(20, 20, 19, 0.45);
+  --color-panel-hairline: rgba(20, 20, 19, 0.2);
+  --color-panel-accent: #c93c0a;
+  --color-swatch: #1b1b19;
+  --grain-opacity: 0.18;
 }
 
 @layer base {
   html {
-    scroll-behavior: smooth;
+    /* Lenis (SmoothScroll.tsx) drives inertia scrolling and its own smooth
+       anchor jumps — native smooth-scroll would double-animate against it. */
+    scroll-behavior: auto;
     -webkit-tap-highlight-color: transparent;
     scrollbar-color: var(--color-hairline) transparent;
   }
@@ -33,14 +64,14 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* The nav backdrop bleeds to 50vw; keep scrollbar-width overshoot from scrolling */
+  /* Full-bleed sections butt against the viewport edge; keep any overshoot from scrolling */
   body {
     overflow-x: clip;
   }
 
-  /* Anchored sections clear the sticky nav (~60px) plus breathing room */
+  /* Anchored sections clear the fixed header plus breathing room */
   [id] {
-    scroll-margin-top: 72px;
+    scroll-margin-top: 80px;
   }
 
   ::-webkit-scrollbar {
@@ -67,28 +98,18 @@
   }
 
   /*
-    Atmosphere. Fixed, non-interactive layers:
-    ::before = corner glow, ::after = film grain (SVG turbulence).
-    The dot field is a canvas (DotField.tsx) so marks react per-dot.
+    Atmosphere. Fixed, non-interactive film-grain layer (SVG turbulence),
+    opacity swaps with the theme via --grain-opacity.
   */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    background-image:
-      radial-gradient(700px 500px at 18% -8%, rgba(124, 246, 255, 0.055), transparent 65%);
-  }
-
   body::after {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 0;
-    opacity: 0.5;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.03 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+    z-index: 4;
+    opacity: var(--grain-opacity);
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
   }
 
   ::selection {
@@ -124,6 +145,58 @@
 
   .fade-up {
     animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  .fade-in {
+    animation: fade-in 1.4s ease both;
+  }
+
+  @keyframes letter-up {
+    from {
+      transform: translateY(118%) rotate(6deg);
+    }
+    to {
+      transform: translateY(0) rotate(0);
+    }
+  }
+  @keyframes blur-in {
+    from {
+      opacity: 0;
+      filter: blur(12px);
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+      transform: none;
+    }
+  }
+  @keyframes sweep-in {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.25;
+      transform: scale(0.72);
+    }
+  }
+  .pulse-dot {
+    animation: pulse-dot 2.6s ease-in-out infinite;
   }
 
   /* Micro-animations — all killed by the reduced-motion block above */
@@ -170,45 +243,47 @@
     color: var(--color-fg);
   }
 
-  /* Work rows — hover tint extends past the text column */
-  .work-row {
-    margin: 0 -12px;
-    padding: 14px 12px;
-    border-radius: 8px;
-    transition: background 0.25s;
+  /* Work-index accordion rows — hover tints the whole row and nudges text in */
+  .case-row {
+    cursor: pointer;
+    color: var(--color-fg);
+    transition:
+      background 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      color 0.35s ease,
+      padding 0.35s ease;
   }
-  .work-row:hover,
-  .work-row:active {
-    background: var(--color-bg-raised);
+  .case-row:hover {
+    background: var(--color-panel);
+    color: var(--color-panel-fg);
+    padding-left: 40px;
   }
-  .work-row .work-name {
-    transition: color 0.2s;
+  .case-plus {
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .work-row:hover .work-name {
-    color: var(--color-accent);
+  .case-row[data-open] .case-plus {
+    transform: rotate(45deg);
   }
-  /* Row number joins the hover moment */
-  .work-num {
-    color: var(--color-fg-muted);
-    transition: color 0.2s;
-  }
-  .work-row:hover .work-num {
-    color: var(--color-accent);
+  .case-panel {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition:
+      max-height 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.5s ease;
   }
 
-  /* Note rows carry a left rule, like the margin line in a notebook */
-  .note-row {
-    border-left: 2px solid var(--color-hairline);
-    border-radius: 0 8px 8px 0;
-    padding-left: 10px;
+  /* Notes-index rows — the row nudges in and tints on hover */
+  .note-index-row {
+    color: var(--color-fg);
     transition:
-      background 0.25s,
-      border-color 0.25s;
+      color 0.3s ease,
+      padding 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .note-row:hover,
-  .note-row:active {
-    border-left-color: var(--color-accent);
+  .note-index-row:hover {
+    color: var(--color-accent);
+    padding-left: 14px;
   }
+
   /* Entry link icons (globe, X, Product Hunt) — subtle lift on hover */
   .entry-icon {
     display: inline-flex;
@@ -241,56 +316,33 @@
     border-color: var(--color-fg-muted);
   }
 
-  /* Sticky nav — hides on scroll down, returns on scroll up (Nav.tsx) */
-  /* Margin keeps the resting offset; only the padded box pins, so the bar stays slim */
-  .nav-bar {
-    position: sticky;
-    top: 0;
-    z-index: 40;
-    margin-top: 20px;
-    padding-top: 12px;
-    padding-bottom: 10px;
-    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  /* Header nav links — dim until their section is active (scroll-spy) */
+  .header-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.55;
+    transition: opacity 0.35s ease;
   }
-  /* Full-bleed blurred backdrop, visible only once content scrolls under */
-  .nav-bar::before {
-    content: "";
-    position: absolute;
-    inset: 0 calc(50% - 50vw);
-    z-index: -1;
-    background: color-mix(in srgb, var(--color-bg) 82%, transparent);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--color-hairline);
-    opacity: 0;
-    transition: opacity 0.25s;
-  }
-  .nav-bar.nav-scrolled::before {
+  .header-link:hover,
+  .header-link[data-active="true"] {
     opacity: 1;
   }
-  .nav-bar.nav-hidden {
-    transform: translateY(-101%);
+  .header-link-dot {
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: currentColor;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .header-link[data-active="true"] .header-link-dot {
+    opacity: 1;
   }
 
-  /* Nav links — underline reveals from the left on hover */
-  .nav-link {
-    position: relative;
-  }
-  /* Links carry py-2 for tap area; 5px keeps the line 3px under the text */
-  .nav-link::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 5px;
-    width: 100%;
-    height: 1px;
-    background: var(--color-fg);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .nav-link:hover::after {
-    transform: scaleX(1);
+  /* Section label — picks up the accent while its section is active */
+  .section-label[data-active="true"] {
+    color: var(--color-accent);
   }
 
   /* Hero scroll cue — gentle looping bob */
