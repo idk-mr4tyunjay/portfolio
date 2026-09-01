@@ -38,7 +38,7 @@ export function NotesPreview() {
             className="hidden text-[10px] tracking-[0.14em] uppercase sm:inline"
             style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}
           >
-            {note.tags[0] ?? "note"} · {note.date.slice(0, 4)}
+            {note.tags[0] ?? "note"}
           </span>
           <span
             className="text-right text-[10px] tracking-[0.14em] uppercase"
