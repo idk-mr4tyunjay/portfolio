@@ -21,7 +21,6 @@ export default function Home() {
               name: SITE.name,
               url: SITE.url,
               jobTitle: SITE.role,
-              email: SITE.email,
               sameAs: [SITE.github, SITE.linkedin, SITE.producthunt],
             },
             {

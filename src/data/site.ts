@@ -12,7 +12,7 @@ export const SITE = {
   github: "https://github.com/idk-mr4tyunjay",
   linkedin: "https://www.linkedin.com/in/mruthunj4y/",
   producthunt: "https://www.producthunt.com/@idk_mr4tyunjay",
-  email: "hi@mruthunjay.xyz",
+  email: "mruthunjayparmar0@gmail.com",
   /** Hero intro line, next to the wordmark. */
   intro: "I build fast, honest things for the web, and write down what I learn and what breaks along the way.",
   /** Hero stat lines (mono, right-aligned), one entry per line. */
