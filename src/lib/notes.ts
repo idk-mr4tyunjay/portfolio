@@ -12,6 +12,14 @@ import type { NoteMeta } from "@/types";
 
 const NOTES_DIR = path.join(process.cwd(), "content", "notes");
 
+const WORDS_PER_MINUTE = 200;
+
+/** Rough "N min" read-time estimate from a word count. */
+export function readingTime(content: string): string {
+  const words = content.trim().split(/\s+/).filter(Boolean).length;
+  return `${Math.max(1, Math.round(words / WORDS_PER_MINUTE))} min`;
+}
+
 function toMeta(slug: string, data: Record<string, unknown>): NoteMeta {
   return {
     slug,
@@ -35,6 +43,20 @@ export function getAllNotes(): NoteMeta[] {
       const slug = file.replace(/\.md$/, "");
       const raw = fs.readFileSync(path.join(NOTES_DIR, file), "utf8");
       return toMeta(slug, matter(raw).data);
+    })
+    .sort((a, b) => (a.date < b.date ? 1 : -1));
+}
+
+export function getAllNotesWithReadingTime(): (NoteMeta & { read: string })[] {
+  if (!fs.existsSync(NOTES_DIR)) return [];
+  return fs
+    .readdirSync(NOTES_DIR)
+    .filter((file) => file.endsWith(".md"))
+    .map((file) => {
+      const slug = file.replace(/\.md$/, "");
+      const raw = fs.readFileSync(path.join(NOTES_DIR, file), "utf8");
+      const { data, content } = matter(raw);
+      return { ...toMeta(slug, data), read: readingTime(content) };
     })
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
