@@ -16,7 +16,7 @@ const bar = (left: number, top: number, width: number) => ({
   width,
   height: 14,
   borderRadius: 7,
-  background: "#f2f2f4",
+  background: "#e9e7e1",
 });
 
 export default function AppleIcon() {
@@ -28,7 +28,7 @@ export default function AppleIcon() {
           height: "100%",
           display: "flex",
           position: "relative",
-          background: "#0a0a0b",
+          background: "#141413",
         }}
       >
         <div style={bar(39, 48, 101)} />
@@ -43,7 +43,7 @@ export default function AppleIcon() {
             width: 36,
             height: 36,
             borderRadius: 18,
-            background: "#7cf6ff",
+            background: "#c93c0a",
           }}
         />
       </div>

@@ -47,7 +47,7 @@ export function NotesPreview() {
             {note.read}
           </span>
           <span
-            className="hidden items-baseline justify-end gap-1.5 text-[9.5px] tracking-[0.16em] uppercase opacity-50 sm:flex"
+            className="hidden items-baseline justify-end gap-1.5 text-[9.5px] font-medium tracking-[0.16em] uppercase opacity-65 sm:flex"
             style={{ fontFamily: "var(--font-mono)" }}
           >
             <span>read</span>
