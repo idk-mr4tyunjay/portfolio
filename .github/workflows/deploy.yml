@@ -34,6 +34,9 @@ jobs:
           context: .
           platforms: linux/arm64
           push: true
+          build-args: |
+            NEXT_PUBLIC_UMAMI_URL=${{ vars.NEXT_PUBLIC_UMAMI_URL }}
+            NEXT_PUBLIC_UMAMI_WEBSITE_ID=${{ vars.NEXT_PUBLIC_UMAMI_WEBSITE_ID }}
           tags: |
             ghcr.io/${{ github.repository_owner }}/portfolio:latest
             ghcr.io/${{ github.repository_owner }}/portfolio:${{ github.sha }}

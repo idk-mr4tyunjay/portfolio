@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SITE } from "@/data/site";
+import { smoothScrollTo } from "@/lib/scroll";
 
 /*
   Command palette, hand-rolled (no deps).
@@ -32,12 +33,7 @@ export function CommandPalette() {
 
   const scrollTo = useCallback(
     (id: string) => {
-      const target = document.getElementById(id);
-      if (target) {
-        const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)")
-          .matches;
-        target.scrollIntoView({ behavior: smooth ? "smooth" : "auto" });
-      } else {
+      if (!smoothScrollTo(id)) {
         // Not on this page — go home to the section
         window.location.href = `/#${id}`;
       }
@@ -47,8 +43,8 @@ export function CommandPalette() {
   );
 
   const actions: Action[] = [
-    { id: "work", label: "go to work", hint: "scroll", run: () => scrollTo("work") },
-    { id: "projects", label: "go to projects", hint: "scroll", run: () => scrollTo("projects") },
+    { id: "work", label: "go to work", hint: "scroll", run: () => scrollTo("index") },
+    { id: "projects", label: "go to projects", hint: "scroll", run: () => scrollTo("selected") },
     { id: "contact", label: "go to contact", hint: "scroll", run: () => scrollTo("contact") },
     {
       id: "notes",

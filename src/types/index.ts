@@ -18,6 +18,12 @@ export interface EntryLink {
   url: string;
 }
 
+/** A screenshot slot — real image once `src` is set, placeholder until then. */
+export interface CaseStudyImage {
+  placeholder: string;
+  src?: string;
+}
+
 export interface Project {
   name: string;
   /** One honest sentence. */
@@ -27,17 +33,51 @@ export interface Project {
   url?: string;
   tech?: string[];
   links?: EntryLink[];
+  /** Product shot, falls back to the hatched placeholder while unset */
+  image?: CaseStudyImage;
 }
 
-export interface Experience {
-  role: string;
-  company: string;
-  /** Free-form range, e.g. "2025 – present" */
-  period: string;
-  /** One honest sentence. */
+/** One line of the "what I did" list in a case study. */
+export interface CaseStudyBullet {
+  text: string;
+  /** Unfilled TODO copy — rendered with a dashed underline as an editing cue */
+  placeholder?: boolean;
+}
+
+/** One row of a multi-product case study (see CaseStudy.products). */
+export interface CaseStudyProduct {
+  name: string;
   description: string;
-  /** Primary site — row renders a globe icon when present */
-  url?: string;
-  tech?: string[];
-  links?: EntryLink[];
+  year: string;
+  /** Its own screenshot, shown alongside this product in the expanded panel */
+  image?: CaseStudyImage;
+}
+
+/** Plain text link, e.g. "payflip.xyz ↗" — case studies list these inline, not as icons. */
+export interface CaseStudyLink {
+  label: string;
+  url: string;
+}
+
+/** Work-index entry: an expandable case study (WorkIndex.tsx). */
+export interface CaseStudy {
+  num: string;
+  name: string;
+  /** Mono meta line, e.g. "engineer · react native · stablecoins" */
+  tagsLine: string;
+  summary: string;
+  /** Free-form range shown in the collapsed row, e.g. "2026 — now" */
+  period: string;
+  /** Serif pull-quote under "the brief" */
+  brief: string;
+  whatIDid?: CaseStudyBullet[];
+  /** Present instead of whatIDid for a multi-product case study */
+  products?: CaseStudyProduct[];
+  chips: string[];
+  links: CaseStudyLink[];
+  /**
+   * Screenshot(s) for a single-product case study. A multi-product case
+   * study (has `products`) carries its screenshots on each product instead.
+   */
+  images?: (CaseStudyImage & { id: string })[];
 }

@@ -54,7 +54,7 @@ export default async function NotePage({
   if (!note) notFound();
 
   return (
-    <div className="mx-auto max-w-[720px] px-6">
+    <>
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -73,7 +73,7 @@ export default async function NotePage({
       />
       <Nav />
       <main>
-        <article className="pt-16 pb-20">
+        <article className="mx-auto max-w-[720px] px-5 pt-24 pb-20 sm:px-6">
           <Link
             href="/notes"
             className="quiet-link text-[13px]"
@@ -92,13 +92,14 @@ export default async function NotePage({
           >
             {note.meta.title}
           </h1>
-          <p
-            className="mb-10 text-xs"
-            style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}
-          >
-            {note.meta.date}
-            {note.meta.tags.length > 0 && <> · {note.meta.tags.join(" · ")}</>}
-          </p>
+          {note.meta.tags.length > 0 && (
+            <p
+              className="mb-10 text-xs"
+              style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}
+            >
+              {note.meta.tags.join(" · ")}
+            </p>
+          )}
           <div
             className="note-prose"
             dangerouslySetInnerHTML={{ __html: note.html }}
@@ -106,6 +107,6 @@ export default async function NotePage({
         </article>
       </main>
       <Footer />
-    </div>
+    </>
   );
 }

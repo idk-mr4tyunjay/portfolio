@@ -2,76 +2,122 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useActiveSection } from "@/lib/useActiveSection";
+import { smoothScrollTo } from "@/lib/scroll";
+import { SECTION_IDS } from "@/lib/sections";
 
 /*
-  Sticky nav that hides on scroll down and returns on scroll up, so
-  navigation stays reachable from deep in the page (phones especially).
-  Transparent at the top; gains a full-bleed blurred backdrop (.nav-bar::before)
-  only once content actually passes under it.
+  Fixed header. Themed via --color-fg so it flips with light/dark instead of
+  relying on mix-blend-mode (which washed out against the cream background).
+  Scroll-spy dots track whichever section is active; the theme toggle
+  persists to localStorage (the blocking script in layout.tsx applies it
+  before paint).
 */
 
-const HIDE_AFTER = 160; // never hide near the top of the page
-const JITTER = 4; // ignore sub-4px scroll noise
+const LINKS: { id: string; label: string }[] = [
+  { id: "index", label: "index" },
+  { id: "selected", label: "work" },
+  { id: "notes", label: "notes" },
+  { id: "contact", label: "contact" },
+];
 
 export function Nav() {
-  const [hidden, setHidden] = useState(false);
+  const active = useActiveSection(SECTION_IDS);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [clock, setClock] = useState("--:--");
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    let lastY = window.scrollY;
-    let ticking = false;
+    setTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
 
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        const y = window.scrollY;
-        setScrolled(y > 8);
-        if (Math.abs(y - lastY) > JITTER) {
-          setHidden(y > lastY && y > HIDE_AFTER);
-          lastY = y;
-        }
-        ticking = false;
-      });
+    // Once the page moves, the bar earns its own surface so it never sits
+    // bare on top of whatever section is passing underneath.
+    let raf = 0;
+    const checkScrolled = () => {
+      raf = 0;
+      setScrolled(window.scrollY > 16);
     };
-
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(checkScrolled);
+    };
+    checkScrolled();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+
+    const tick = () =>
+      setClock(
+        new Intl.DateTimeFormat("en-GB", {
+          timeZone: "Asia/Kolkata",
+          hour: "2-digit",
+          minute: "2-digit",
+        }).format(new Date()),
+      );
+    tick();
+    const id = setInterval(tick, 20000);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
+  const toggleTheme = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem("mj-theme", next);
+    } catch {
+      // storage disabled — theme just won't persist across reloads
+    }
+  };
+
+  const go = (id: string) => (e: React.MouseEvent) => {
+    if (document.getElementById(id)) {
+      e.preventDefault();
+      smoothScrollTo(id);
+    }
+  };
+
   return (
-    <nav
-      aria-label="Main"
-      className={`nav-bar flex items-center justify-between gap-4${
-        hidden ? " nav-hidden" : ""
-      }${scrolled ? " nav-scrolled" : ""}`}
+    <header
+      data-scrolled={scrolled}
+      className={`nav-bar fixed inset-x-0 top-0 z-40 grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 py-4 text-[9px] tracking-[0.14em] uppercase sm:gap-5 sm:px-[30px] sm:text-[10.5px] sm:tracking-[0.18em] ${
+        scrolled ? "backdrop-blur-xl backdrop-saturate-150" : ""
+      }`}
+      style={{ fontFamily: "var(--font-mono)" }}
     >
-      <Link
-        href="/"
-        className="flex items-center gap-2 py-2 text-[14px] font-medium"
-        style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg)" }}
-      >
-        <span
-          aria-hidden
-          className="inline-block size-2 rounded-full"
-          style={{ background: "var(--color-accent)" }}
-        />
-        mj
+      <Link href="/" onClick={go("top")} className="justify-self-start whitespace-nowrap">
+        mruthunjay
       </Link>
-      <div className="flex gap-4 text-[14px] sm:gap-6">
-        <Link href="/#work" className="quiet-link nav-link py-2">
-          work
-        </Link>
-        <Link href="/#projects" className="quiet-link nav-link py-2">
-          projects
-        </Link>
-        <Link href="/notes" className="quiet-link nav-link py-2">
-          notes
-        </Link>
-        <Link href="/#contact" className="quiet-link nav-link py-2">
-          contact
-        </Link>
+      <nav aria-label="Main" className="flex justify-self-center gap-2 sm:gap-5">
+        {LINKS.map((link) => (
+          <Link
+            key={link.id}
+            href={`/#${link.id}`}
+            onClick={go(link.id)}
+            className="header-link py-2"
+            data-active={active === link.id}
+          >
+            <span aria-hidden className="header-link-dot" />
+            {link.label}
+          </Link>
+        ))}
+      </nav>
+      <div className="flex items-center gap-2.5 justify-self-end sm:gap-3.5">
+        <span className="hidden opacity-70 [font-variant-numeric:tabular-nums] sm:inline">
+          {clock} ist
+        </span>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+          className="nav-toggle-btn flex cursor-pointer items-center gap-1.5 border px-2 py-1.5 sm:px-2.5"
+          style={{ background: "none", color: "inherit", font: "inherit" }}
+        >
+          <span aria-hidden className="inline-block size-1.5 rounded-full" style={{ background: "currentColor" }} />
+          <span className="hidden sm:inline">{theme === "dark" ? "light" : "dark"}</span>
+        </button>
       </div>
-    </nav>
+    </header>
   );
 }

@@ -9,6 +9,13 @@ RUN npm ci
 
 COPY . .
 
+# Public Umami config, inlined into the client bundle at build time.
+# Empty by default -> the tracking script simply is not rendered.
+ARG NEXT_PUBLIC_UMAMI_URL
+ARG NEXT_PUBLIC_UMAMI_WEBSITE_ID
+ENV NEXT_PUBLIC_UMAMI_URL=$NEXT_PUBLIC_UMAMI_URL
+ENV NEXT_PUBLIC_UMAMI_WEBSITE_ID=$NEXT_PUBLIC_UMAMI_WEBSITE_ID
+
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 

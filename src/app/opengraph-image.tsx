@@ -1,17 +1,35 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { SITE } from "@/data/site";
 
 /*
   Social share card — 1200×630 PNG generated at build with next/og.
   Also serves as the Twitter image (crawlers fall back to og:image).
-  Colors mirror the design tokens in globals.css.
+  Mirrors the hero: cream ground, Archivo wordmark, mono meta lines.
+  Colors are the light-theme tokens from globals.css.
 */
+
+// Read at build time — paths stay literal so file tracing picks them up.
+const ARCHIVO_BOLD = readFileSync(join(process.cwd(), "src/assets/fonts/Archivo-Bold.ttf"));
+const MONO_REGULAR = readFileSync(join(process.cwd(), "src/assets/fonts/JetBrainsMono-Regular.ttf"));
+
+const BG = "#e9e7e1";
+const FG = "#141413";
+const MUTED = "rgba(20, 20, 19, 0.62)";
+const HAIRLINE = "rgba(20, 20, 19, 0.22)";
+const ACCENT = "#c93c0a";
+
+// Baked at build. The fonts are read off disk, which only exists then.
+export const dynamic = "force-static";
 
 export const alt = `${SITE.name} · ${SITE.role}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default function OpengraphImage() {
+  const tagline = `${SITE.heroTagline.lead} ${SITE.heroTagline.italic}`;
+
   return new ImageResponse(
     (
       <div
@@ -20,60 +38,61 @@ export default function OpengraphImage() {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          padding: "80px 90px",
-          background: "#0a0a0b",
-          backgroundImage:
-            "radial-gradient(900px 600px at 15% -10%, rgba(124,246,255,0.14), transparent 60%)",
-          color: "#f2f2f4",
-          fontFamily: "monospace",
+          justifyContent: "space-between",
+          padding: "64px 72px",
+          background: BG,
+          color: FG,
+          fontFamily: "JetBrains Mono",
         }}
       >
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            fontSize: 26,
-            color: "#7cf6ff",
-            letterSpacing: 2,
+            justifyContent: "space-between",
+            fontSize: 21,
+            letterSpacing: 3.6,
+            color: MUTED,
           }}
         >
-          {SITE.url.replace("https://", "")}
+          <span>{SITE.url.replace("https://", "").toUpperCase()}</span>
+          <span style={{ color: ACCENT }}>{SITE.role.toUpperCase()}</span>
         </div>
-        <div
-          style={{
-            display: "flex",
-            marginTop: 40,
-            fontSize: 128,
-            fontWeight: 700,
-            letterSpacing: -3,
-            lineHeight: 1,
-          }}
-        >
-          {SITE.name}
+
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div
+            style={{
+              display: "flex",
+              fontFamily: "Archivo",
+              fontSize: 188,
+              lineHeight: 1,
+              letterSpacing: -10,
+              paddingBottom: 12,
+            }}
+          >
+            {SITE.name}
+          </div>
+          <div style={{ display: "flex", height: 1, background: HAIRLINE, marginTop: 34 }} />
+          <div
+            style={{
+              display: "flex",
+              marginTop: 26,
+              maxWidth: 960,
+              fontSize: 27,
+              lineHeight: 1.45,
+              color: MUTED,
+            }}
+          >
+            {tagline}
+          </div>
         </div>
-        <div
-          style={{
-            display: "flex",
-            marginTop: 28,
-            fontSize: 40,
-            color: "#8a8a90",
-          }}
-        >
-          {SITE.tagline}
-        </div>
-        <div
-          style={{
-            display: "flex",
-            marginTop: 56,
-            width: 120,
-            height: 6,
-            borderRadius: 999,
-            background: "#7cf6ff",
-          }}
-        />
       </div>
     ),
-    { ...size },
+    {
+      ...size,
+      fonts: [
+        { name: "Archivo", data: ARCHIVO_BOLD, weight: 700, style: "normal" },
+        { name: "JetBrains Mono", data: MONO_REGULAR, weight: 400, style: "normal" },
+      ],
+    },
   );
 }
