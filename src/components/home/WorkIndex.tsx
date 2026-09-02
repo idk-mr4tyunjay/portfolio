@@ -121,11 +121,7 @@ export function WorkIndex() {
                 </span>
               </div>
 
-              <div
-                id={PANEL_ID(cs.name)}
-                className="case-panel"
-                style={isOpen ? { maxHeight: 1400, opacity: 1 } : undefined}
-              >
+              <div id={PANEL_ID(cs.name)} className="case-panel" data-open={isOpen}>
                 <div className="grid gap-8 pt-1 pb-10 sm:grid-cols-2">
                   <div className="flex flex-col gap-5">
                     <div>
