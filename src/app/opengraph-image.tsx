@@ -20,6 +20,9 @@ const MUTED = "rgba(20, 20, 19, 0.62)";
 const HAIRLINE = "rgba(20, 20, 19, 0.22)";
 const ACCENT = "#c93c0a";
 
+// Baked at build. The fonts are read off disk, which only exists then.
+export const dynamic = "force-static";
+
 export const alt = `${SITE.name} · ${SITE.role}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
