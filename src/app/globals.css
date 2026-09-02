@@ -277,13 +277,26 @@
   .case-row[data-open] .case-plus {
     transform: rotate(45deg);
   }
+  /*
+    Expanding case study. The row animates from 0fr to 1fr so an open panel
+    is exactly as tall as its content. A fixed max-height silently clipped
+    the tallest case study on narrow phones.
+  */
   .case-panel {
-    max-height: 0;
-    overflow: hidden;
+    display: grid;
+    grid-template-rows: 0fr;
     opacity: 0;
     transition:
-      max-height 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+      grid-template-rows 0.65s cubic-bezier(0.22, 1, 0.36, 1),
       opacity 0.5s ease;
+  }
+  .case-panel > * {
+    overflow: hidden;
+    min-height: 0;
+  }
+  .case-panel[data-open="true"] {
+    grid-template-rows: 1fr;
+    opacity: 1;
   }
 
   /* Notes-index rows — the row nudges in and tints on hover */
@@ -373,10 +386,20 @@
 
   /* Nav theme toggle — border tracks the header's current (theme-aware) color */
   .nav-toggle-btn {
+    position: relative;
     border-color: color-mix(in srgb, currentColor 45%, transparent);
     transition:
       border-color 0.2s ease,
       color 0.3s ease;
+  }
+  /*
+    On phones the label is hidden, leaving a 24x20 mark. Stretch the touch
+    target out to ~44px without growing what is drawn.
+  */
+  .nav-toggle-btn::after {
+    content: "";
+    position: absolute;
+    inset: -14px;
   }
   .nav-toggle-btn:hover {
     border-color: currentColor;
