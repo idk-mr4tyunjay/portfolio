@@ -18,6 +18,12 @@ export interface EntryLink {
   url: string;
 }
 
+/** A screenshot slot — real image once `src` is set, placeholder until then. */
+export interface CaseStudyImage {
+  placeholder: string;
+  src?: string;
+}
+
 export interface Project {
   name: string;
   /** One honest sentence. */
@@ -27,6 +33,8 @@ export interface Project {
   url?: string;
   tech?: string[];
   links?: EntryLink[];
+  /** Product shot, falls back to the hatched placeholder while unset */
+  image?: CaseStudyImage;
 }
 
 /** One line of the "what I did" list in a case study. */
@@ -34,12 +42,6 @@ export interface CaseStudyBullet {
   text: string;
   /** Unfilled TODO copy — rendered with a dashed underline as an editing cue */
   placeholder?: boolean;
-}
-
-/** A case-study screenshot slot — real image once `src` is set, placeholder until then. */
-export interface CaseStudyImage {
-  placeholder: string;
-  src?: string;
 }
 
 /** One row of a multi-product case study (see CaseStudy.products). */

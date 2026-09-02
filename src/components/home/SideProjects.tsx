@@ -38,7 +38,8 @@ export function SideProjects() {
             >
               <div className="relative overflow-hidden">
                 <ImagePlaceholder
-                  caption={`${project.name.toLowerCase()} · product shot`}
+                  caption={project.image?.placeholder ?? `${project.name.toLowerCase()} · product shot`}
+                  src={project.image?.src}
                   className="transition-colors group-hover:[border-color:var(--color-accent)]"
                 />
                 <span className="pointer-events-none absolute inset-x-0 top-0 flex justify-between p-3 text-[9.5px] tracking-[0.16em] uppercase" style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}>

@@ -14,14 +14,22 @@ export const PROJECTS: Project[] = [
     url: "https://growix.devtown.lol",
     tech: ["next.js", "postgres", "docker"],
     links: [{ type: "github", url: "https://github.com/idk-mr4tyunjay/growix" }],
+    image: {
+      placeholder: "growix.devtown.lol · dashboard",
+      src: "/images/projects/project-growix.webp",
+    },
   },
   {
     name: "VPS Setup",
     description: "Scripts to provision and harden a fresh VPS, from first login to running apps.",
     year: "2026",
-    url: "https://idk-mr4tyunjay.github.io/vps-setup/",
+    url: "https://vps.devtown.lol",
     tech: ["bash", "docker"],
     links: [{ type: "github", url: "https://github.com/idk-mr4tyunjay/vps-setup" }],
+    image: {
+      placeholder: "vps.devtown.lol · the runbook",
+      src: "/images/projects/project-vps-setup.webp",
+    },
   },
   {
     name: "Multi-Window",
@@ -30,5 +38,9 @@ export const PROJECTS: Project[] = [
     url: "https://multi-window-xd.vercel.app/",
     tech: ["three.js"],
     links: [{ type: "github", url: SITE.github }],
+    image: {
+      placeholder: "multi-window · three windows in sync",
+      src: "/images/projects/project-multi-window.webp",
+    },
   },
 ];
