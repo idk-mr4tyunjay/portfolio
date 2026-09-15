@@ -81,3 +81,20 @@ export interface CaseStudy {
    */
   images?: (CaseStudyImage & { id: string })[];
 }
+
+/** Output of scripts/receipts.mjs (SPEC.md §7). */
+export interface Receipts {
+  /** ISO date the site was built. */
+  builtAt: string;
+  /** ISO date of the latest public commit, null if GitHub did not answer. */
+  commitAt: string | null;
+  links: Record<
+    string,
+    {
+      ok: boolean;
+      status: number;
+      checkedAt: string;
+      lastSeen: string | null;
+    }
+  >;
+}

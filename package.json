@@ -2,13 +2,15 @@
   "name": "portfolio",
   "version": "0.1.0",
   "private": true,
-  "description": "Minimal, content-first developer portfolio built with Next.js and React.",
+  "description": "Developer portfolio. Receipts, not claims.",
   "scripts": {
     "dev": "next dev --turbopack",
+    "prebuild": "node scripts/receipts.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "receipts": "node scripts/receipts.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
