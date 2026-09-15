@@ -1,64 +1,64 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useActiveSection } from "@/lib/useActiveSection";
 import { smoothScrollTo } from "@/lib/scroll";
 import { SECTION_IDS } from "@/lib/sections";
+import { SITE } from "@/data/site";
 
 /*
-  Fixed header. Themed via --color-fg so it flips with light/dark instead of
-  relying on mix-blend-mode (which washed out against the cream background).
-  Scroll-spy dots track whichever section is active; the theme toggle
-  persists to localStorage (the blocking script in layout.tsx applies it
-  before paint).
+  Nav — SPEC.md §4.7. Name, four links, theme. One dot slides under the
+  active section. Earns a surface once the page scrolls so rows never read
+  through it.
 */
 
-const LINKS: { id: string; label: string }[] = [
-  { id: "index", label: "index" },
-  { id: "selected", label: "work" },
-  { id: "notes", label: "notes" },
-  { id: "contact", label: "contact" },
-];
+const LINKS = [
+  { id: "work", label: "Work" },
+  { id: "about", label: "About" },
+  { id: "notes", label: "Notes", href: "/notes" },
+  { id: "contact", label: "Contact" },
+] as const;
 
 export function Nav() {
   const active = useActiveSection(SECTION_IDS);
   const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [clock, setClock] = useState("--:--");
   const [scrolled, setScrolled] = useState(false);
+  const listRef = useRef<HTMLElement>(null);
+  const dotRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     setTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
-
-    // Once the page moves, the bar earns its own surface so it never sits
-    // bare on top of whatever section is passing underneath.
     let raf = 0;
-    const checkScrolled = () => {
+    const check = () => {
       raf = 0;
       setScrolled(window.scrollY > 16);
     };
     const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(checkScrolled);
+      if (!raf) raf = requestAnimationFrame(check);
     };
-    checkScrolled();
+    check();
     window.addEventListener("scroll", onScroll, { passive: true });
-
-    const tick = () =>
-      setClock(
-        new Intl.DateTimeFormat("en-GB", {
-          timeZone: "Asia/Kolkata",
-          hour: "2-digit",
-          minute: "2-digit",
-        }).format(new Date()),
-      );
-    tick();
-    const id = setInterval(tick, 20000);
     return () => {
-      clearInterval(id);
       window.removeEventListener("scroll", onScroll);
       if (raf) cancelAnimationFrame(raf);
     };
   }, []);
+
+  // Slide the dot under the active link. "side" (side projects) counts as about's neighbour: no link, keep the last one.
+  useEffect(() => {
+    const dot = dotRef.current;
+    const list = listRef.current;
+    if (!dot || !list) return;
+    const id = active === "side" ? "about" : active;
+    const link = id ? list.querySelector<HTMLElement>(`[data-id="${id}"]`) : null;
+    if (!link) {
+      dot.dataset.visible = "false";
+      return;
+    }
+    dot.dataset.visible = "true";
+    dot.style.transform = `translateX(${link.offsetLeft + link.offsetWidth / 2 - 2.5}px)`;
+  }, [active]);
 
   const toggleTheme = () => {
     const next = theme === "dark" ? "light" : "dark";
@@ -67,7 +67,7 @@ export function Nav() {
     try {
       localStorage.setItem("mj-theme", next);
     } catch {
-      // storage disabled — theme just won't persist across reloads
+      // storage disabled; the theme just won't persist
     }
   };
 
@@ -81,43 +81,36 @@ export function Nav() {
   return (
     <header
       data-scrolled={scrolled}
-      className={`nav-bar fixed inset-x-0 top-0 z-40 grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 py-4 text-[9px] tracking-[0.14em] uppercase sm:gap-5 sm:px-[30px] sm:text-[10.5px] sm:tracking-[0.18em] ${
-        scrolled ? "backdrop-blur-xl backdrop-saturate-150" : ""
-      }`}
-      style={{ fontFamily: "var(--font-mono)" }}
+      className={`nav-bar fixed inset-x-0 top-0 z-40 flex items-center justify-between gap-4 px-[var(--gutter)] py-4 text-[13px] font-medium ${scrolled ? "backdrop-blur-md" : ""}`}
     >
-      <Link href="/" onClick={go("top")} className="justify-self-start whitespace-nowrap">
-        mruthunjay
+      <Link href="/" onClick={go("top")} className="nav-link" data-cursor="open" style={{ opacity: 1 }}>
+        {SITE.name}
       </Link>
-      <nav aria-label="Main" className="flex justify-self-center gap-2 sm:gap-5">
+      <nav ref={listRef} aria-label="Main" className="relative flex gap-5 sm:gap-7">
         {LINKS.map((link) => (
           <Link
             key={link.id}
-            href={`/#${link.id}`}
+            href={"href" in link ? link.href : `/#${link.id}`}
             onClick={go(link.id)}
-            className="header-link py-2"
-            data-active={active === link.id}
+            className="nav-link"
+            data-id={link.id}
+            data-active={active === link.id || (link.id === "about" && active === "side")}
+            data-cursor="open"
           >
-            <span aria-hidden className="header-link-dot" />
             {link.label}
           </Link>
         ))}
+        <span ref={dotRef} className="nav-dot" data-visible="false" aria-hidden />
       </nav>
-      <div className="flex items-center gap-2.5 justify-self-end sm:gap-3.5">
-        <span className="hidden opacity-70 [font-variant-numeric:tabular-nums] sm:inline">
-          {clock} ist
-        </span>
-        <button
-          type="button"
-          onClick={toggleTheme}
-          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-          className="nav-toggle-btn flex cursor-pointer items-center gap-1.5 border px-2 py-1.5 sm:px-2.5"
-          style={{ background: "none", color: "inherit", font: "inherit" }}
-        >
-          <span aria-hidden className="inline-block size-1.5 rounded-full" style={{ background: "currentColor" }} />
-          <span className="hidden sm:inline">{theme === "dark" ? "light" : "dark"}</span>
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={toggleTheme}
+        aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+        className="nav-link cursor-pointer border-0 bg-transparent p-0 font-[inherit]"
+        data-cursor="open"
+      >
+        {theme === "dark" ? "Light" : "Dark"}
+      </button>
     </header>
   );
 }

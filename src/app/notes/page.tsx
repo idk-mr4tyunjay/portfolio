@@ -6,7 +6,7 @@ import { SITE } from "@/data/site";
 import { getAllNotes } from "@/lib/notes";
 import { OG_IMAGE } from "@/lib/seo";
 
-const DESCRIPTION = "Things I learned, written down.";
+const DESCRIPTION = "Dated notes on what broke and what I learned.";
 
 export const metadata: Metadata = {
   title: "notes",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: "/notes",
     type: "website",
-    siteName: "Mruthunjay",
+    siteName: SITE.name,
     locale: "en_US",
     images: [OG_IMAGE],
   },
@@ -35,30 +35,23 @@ export default function NotesPage() {
       <Nav />
       <main>
         <NotesIndex notes={getAllNotes()} />
-        <section aria-label="Contact" className="relative overflow-hidden px-5 pt-6 pb-9 sm:px-[30px]">
-          <span className="text-[10.5px] tracking-[0.2em] uppercase" style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}>
-            contact
-          </span>
-          <h2 className="mt-6 font-bold" style={{ fontSize: "clamp(46px,11vw,180px)", lineHeight: 0.8, letterSpacing: "-0.055em" }}>
-            Have something
-            <br />
-            <span style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontWeight: 400 }}>to build?</span>
-          </h2>
-          <div
-            className="mt-11 grid gap-7 pt-5"
-            style={{ gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", borderTop: "1px solid var(--color-hairline)" }}
-          >
-            <p className="m-0 max-w-[34ch] text-[16px] leading-relaxed text-pretty" style={{ color: "var(--color-fg-secondary)" }}>
-              Or you&apos;re just here to inspect-element the CSS. Either way, hi.
-            </p>
-            <div className="flex flex-col items-start gap-2 text-[11px] tracking-[0.16em] uppercase" style={{ fontFamily: "var(--font-mono)" }}>
-              <a href={SITE.linkedin} target="_blank" rel="noreferrer" className="quiet-link">
-                linkedin ↗
-              </a>
-              <a href={SITE.github} target="_blank" rel="noreferrer" className="quiet-link">
-                github ↗
-              </a>
-            </div>
+        <section aria-label="Contact" className="gutter pt-10 pb-12">
+          <div className="grid gap-6 border-t border-[var(--color-hairline)] pt-6 sm:grid-cols-[minmax(0,1fr)_auto]">
+            <a href={`mailto:${SITE.email}`} className="t-row-sm link justify-self-start" data-cursor="open">
+              {SITE.email}
+            </a>
+            <ul className="m-0 flex list-none flex-wrap gap-x-6 gap-y-2 p-0 text-[15px]">
+              <li>
+                <a href={SITE.github} target="_blank" rel="noreferrer" className="link" data-cursor="open">
+                  github
+                </a>
+              </li>
+              <li>
+                <a href={SITE.linkedin} target="_blank" rel="noreferrer" className="link" data-cursor="open">
+                  linkedin
+                </a>
+              </li>
+            </ul>
           </div>
         </section>
       </main>

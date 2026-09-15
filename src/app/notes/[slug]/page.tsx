@@ -7,6 +7,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { getAllNotes, getNote } from "@/lib/notes";
 import { OG_IMAGE } from "@/lib/seo";
 import { SITE } from "@/data/site";
+import { shortDate } from "@/lib/receipts";
 
 export function generateStaticParams() {
   return getAllNotes().map((note) => ({ slug: note.slug }));
@@ -73,37 +74,16 @@ export default async function NotePage({
       />
       <Nav />
       <main>
-        <article className="mx-auto max-w-[720px] px-5 pt-24 pb-20 sm:px-6">
-          <Link
-            href="/notes"
-            className="quiet-link text-[13px]"
-            style={{ fontFamily: "var(--font-mono)" }}
-          >
-            ← notes
+        <article className="gutter max-w-[880px] pt-28 pb-20 sm:pt-36">
+          <Link href="/notes" className="link text-[15px]" data-cursor="open">
+            all notes
           </Link>
-          <h1
-            className="mt-6 mb-3"
-            style={{
-              fontSize: "clamp(28px, 4.5vw, 40px)",
-              fontWeight: 600,
-              letterSpacing: "-0.02em",
-              lineHeight: 1.15,
-            }}
-          >
-            {note.meta.title}
-          </h1>
-          {note.meta.tags.length > 0 && (
-            <p
-              className="mb-10 text-xs"
-              style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}
-            >
-              {note.meta.tags.join(" · ")}
-            </p>
-          )}
-          <div
-            className="note-prose"
-            dangerouslySetInnerHTML={{ __html: note.html }}
-          />
+          <h1 className="t-row mt-8 mb-4 max-w-[18ch] text-balance">{note.meta.title}</h1>
+          <p className="t-meta mb-12 flex flex-wrap gap-x-4">
+            <time dateTime={note.meta.date}>{shortDate(note.meta.date)}</time>
+            {note.meta.tags.length > 0 && <span>{note.meta.tags.join(", ")}</span>}
+          </p>
+          <div className="note-prose" dangerouslySetInnerHTML={{ __html: note.html }} />
         </article>
       </main>
       <Footer />

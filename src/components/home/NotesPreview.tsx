@@ -1,71 +1,46 @@
 import Link from "next/link";
-import { getAllNotesWithReadingTime } from "@/lib/notes";
-import { SectionHeader } from "./SectionHeader";
+import { getAllNotes } from "@/lib/notes";
+import { shortDate } from "@/lib/receipts";
+import { Warli } from "./Warli";
 
 /*
-  Recent notes, numbered-row style. Real content from content/notes/*.md via
-  getAllNotesWithReadingTime() — the mockup's row layout with real data.
+  Notes, what broke — SPEC.md §4.5. A dated list, newest first, with the
+  tangle drawn behind it (Roots.tsx) and the Warli figure under the tangle.
 */
 
 export function NotesPreview() {
-  const notes = getAllNotesWithReadingTime().slice(0, 3);
+  const notes = getAllNotes().slice(0, 5);
   if (notes.length === 0) return null;
 
   return (
-    <section id="notes" aria-label="Notes" className="relative px-5 pt-20 sm:px-[30px]">
-      <SectionHeader id="notes" number="04" label="notes" tagline="things I worked out the hard way" />
-
-      {notes.map((note, index) => (
-        <Link
-          key={note.slug}
-          href={`/notes/${note.slug}`}
-          className="note-index-row grid grid-cols-[36px_1fr_auto] items-baseline gap-4 py-5 sm:grid-cols-[52px_minmax(0,1fr)_140px_60px_60px] sm:gap-5"
-          style={{ borderTop: "1px solid var(--color-hairline)" }}
-        >
-          <span
-            className="text-[34px] leading-[0.9] font-bold"
-            style={{ color: "transparent", WebkitTextStroke: "1px var(--color-hairline)" }}
-          >
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          <span
-            className="text-pretty"
-            style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(22px,2.7vw,34px)", lineHeight: 1.12, letterSpacing: "-0.01em" }}
-          >
-            {note.title}
-          </span>
-          <span
-            className="hidden text-[10px] tracking-[0.14em] uppercase sm:inline"
-            style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}
-          >
-            {note.tags[0] ?? "note"}
-          </span>
-          <span
-            className="text-right text-[10px] tracking-[0.14em] uppercase"
-            style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}
-          >
-            {note.read}
-          </span>
-          <span
-            className="hidden items-baseline justify-end gap-1.5 text-[9.5px] font-medium tracking-[0.16em] uppercase opacity-65 sm:flex"
-            style={{ fontFamily: "var(--font-mono)" }}
-          >
-            <span>read</span>
-            <span className="text-[13px]">→</span>
-          </span>
+    <section id="notes" aria-label="Notes" className="gutter relative pt-24 pb-16 sm:pt-32 sm:pb-24">
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-4 sm:mb-12">
+        <h2 className="t-title m-0">What broke</h2>
+        <Link href="/notes" className="link text-[15px]" data-cursor="open">
+          all notes
         </Link>
-      ))}
+      </div>
 
-      <div
-        className="flex flex-wrap items-baseline justify-between gap-4 py-4"
-        style={{ borderTop: "1px solid var(--color-hairline)" }}
-      >
-        <span className="text-[10px] tracking-[0.16em] uppercase" style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}>
-          notes are written as I break things
-        </span>
-        <Link href="/notes" className="quiet-link text-[10.5px] tracking-[0.2em] uppercase" style={{ fontFamily: "var(--font-mono)" }}>
-          all notes →
-        </Link>
+      <ol className="m-0 list-none p-0">
+        {notes.map((note) => (
+          <li key={note.slug} className="border-t border-[var(--color-hairline)]">
+            <Link
+              href={`/notes/${note.slug}`}
+              className="row grid-cols-1 gap-2 py-5 sm:grid-cols-[120px_minmax(0,1fr)_auto] sm:items-baseline sm:gap-8"
+              data-cursor="open"
+            >
+              <time dateTime={note.date} className="t-meta text-[var(--color-fg)]">
+                {shortDate(note.date)}
+              </time>
+              <span className="row-name t-row-sm block max-w-[26ch]">{note.title}</span>
+              <span className="t-meta sm:text-right">{note.tags.join(", ")}</span>
+            </Link>
+          </li>
+        ))}
+      </ol>
+
+      <div className="mt-16 grid justify-end border-t border-[var(--color-hairline)] pt-6 sm:mt-24">
+        <Warli />
       </div>
     </section>
   );

@@ -1,2 +1,2 @@
-/** Anchor ids for scroll-spy — shared by the header nav and every section label. */
-export const SECTION_IDS = ["index", "selected", "notes", "contact"] as const;
+/** Anchor ids for scroll-spy, shared by the header nav and the command palette. */
+export const SECTION_IDS = ["work", "about", "side", "notes", "contact"] as const;

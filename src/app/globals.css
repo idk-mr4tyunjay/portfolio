@@ -1,55 +1,48 @@
 @import "tailwindcss";
 
 /*
-  Design tokens.
-  Anything that ships to the DOM references these — never inline a hex.
+  Design tokens — SPEC.md §3.
+  White, black, one blue. Blue means live. Anything that ships to the DOM
+  references these; never inline a hex.
 */
 
 @theme {
-  --color-bg: #e9e7e1;
-  --color-bg-raised: #e2dfd8;
-  --color-fg: #141413;
-  --color-fg-body: rgba(20, 20, 19, 0.72);
-  --color-fg-secondary: rgba(20, 20, 19, 0.66);
-  --color-fg-muted: rgba(20, 20, 19, 0.62);
-  --color-hairline: rgba(20, 20, 19, 0.22);
-  --color-rail: rgba(20, 20, 19, 0.055);
-  --color-accent: #c93c0a;
-  --color-ok: #4ade80;
-  --color-panel: #141413;
-  --color-panel-fg: #e9e7e1;
-  --color-panel-fg-body: rgba(233, 231, 225, 0.66);
-  --color-panel-fg-muted: rgba(233, 231, 225, 0.52);
-  --color-panel-hairline: rgba(233, 231, 225, 0.18);
-  --color-panel-accent: #e8703f;
-  --color-swatch: #e2dfd8;
-  --grain-opacity: 0.3;
+  --color-bg: #f1f1ef;
+  --color-fg: #0a0a0a;
+  --color-fg-muted: rgba(10, 10, 10, 0.55);
+  --color-hairline: rgba(10, 10, 10, 0.18);
+  --color-live: #0026ff;
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+:root {
+  --gutter: 20px;
+  --text-name: clamp(48px, 18.6vw, 340px);
+  --text-title: clamp(40px, 8vw, 128px);
+  --text-row: clamp(28px, 4.5vw, 72px);
+  --text-row-sm: clamp(20px, 2.6vw, 40px);
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --gutter: 30px;
+  }
 }
 
 :root[data-theme="dark"] {
-  --color-bg: #111110;
-  --color-bg-raised: #1b1b19;
-  --color-fg: #eceae2;
-  --color-fg-body: rgba(236, 234, 226, 0.72);
-  --color-fg-secondary: rgba(236, 234, 226, 0.58);
-  --color-fg-muted: rgba(236, 234, 226, 0.52);
-  --color-hairline: rgba(236, 234, 226, 0.28);
-  --color-rail: rgba(236, 234, 226, 0.05);
-  --color-accent: #f0713d;
-  --color-panel: #eceae2;
-  --color-panel-fg: #141413;
-  --color-panel-fg-body: rgba(20, 20, 19, 0.68);
-  --color-panel-fg-muted: rgba(20, 20, 19, 0.62);
-  --color-panel-hairline: rgba(20, 20, 19, 0.2);
-  --color-panel-accent: #c93c0a;
-  --color-swatch: #1b1b19;
-  --grain-opacity: 0.18;
+  --color-bg: #0a0a0a;
+  --color-fg: #f1f1ef;
+  --color-fg-muted: rgba(241, 241, 239, 0.55);
+  --color-hairline: rgba(241, 241, 239, 0.2);
+  --color-live: #3d5bff;
 }
 
 @layer base {
   html {
-    /* Lenis (SmoothScroll.tsx) drives inertia scrolling and its own smooth
-       anchor jumps — native smooth-scroll would double-animate against it. */
+    /* Lenis (SmoothScroll.tsx) owns inertia scrolling and anchor jumps. */
     scroll-behavior: auto;
     -webkit-tap-highlight-color: transparent;
     scrollbar-color: var(--color-hairline) transparent;
@@ -59,19 +52,29 @@
   body {
     background: var(--color-bg);
     color: var(--color-fg);
+    font-family: var(--font-sans), "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-variant-numeric: tabular-nums;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
   }
 
-  /* Full-bleed sections butt against the viewport edge; keep any overshoot from scrolling */
   body {
     overflow-x: clip;
+    font-size: 16px;
+    line-height: 1.5;
   }
 
-  /* Anchored sections clear the fixed header plus breathing room */
   [id] {
-    scroll-margin-top: 80px;
+    scroll-margin-top: 72px;
+  }
+
+  /* The weather canvas draws the pointer; hide the native one only once it is mounted. */
+  html[data-cursor="custom"],
+  html[data-cursor="custom"] * {
+    cursor: none !important;
   }
 
   ::-webkit-scrollbar {
@@ -82,149 +85,25 @@
   }
   ::-webkit-scrollbar-thumb {
     background: var(--color-hairline);
-    border-radius: 5px;
     border: 3px solid var(--color-bg);
   }
 
-  kbd {
-    font-family: var(--font-mono);
-    font-size: 0.85em;
-    padding: 1px 5px;
-    margin: 0 2px;
-    border: 1px solid var(--color-hairline);
-    border-bottom-width: 2px;
-    border-radius: 4px;
-    background: var(--color-bg-raised);
-  }
-
-  /*
-    Atmosphere. Fixed, non-interactive film-grain layer (SVG turbulence),
-    opacity swaps with the theme via --grain-opacity.
-  */
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 4;
-    opacity: var(--grain-opacity);
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
-  }
-
   ::selection {
-    background: var(--color-accent);
+    background: var(--color-fg);
     color: var(--color-bg);
   }
 
-  /* Focus indicator */
   *:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
+    outline: 2px solid var(--color-fg);
+    outline-offset: 4px;
   }
 
-  /* Reduced motion */
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
-
-  /* Shows the hero intro loader from the very first paint (layout.tsx's blocking script sets this) — avoids a flash of page content before it. */
-  html[data-show-intro] .intro-overlay {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* Entrance — killed by the reduced-motion block above */
-  @keyframes fade-up {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-  }
-
-  .fade-up {
-    animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-  }
-  .fade-in {
-    animation: fade-in 1.4s ease both;
-  }
-
-  @keyframes letter-up {
-    from {
-      transform: translateY(140%) rotate(6deg);
-    }
-    to {
-      transform: translateY(0) rotate(0);
-    }
-  }
-  @keyframes blur-in {
-    from {
-      opacity: 0;
-      filter: blur(12px);
-      transform: translateY(16px);
-    }
-    to {
-      opacity: 1;
-      filter: blur(0);
-      transform: none;
-    }
-  }
-  @keyframes sweep-in {
-    from {
-      transform: scaleX(0);
-    }
-    to {
-      transform: scaleX(1);
-    }
-  }
-  @keyframes pulse-dot {
-    0%,
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.25;
-      transform: scale(0.72);
-    }
-  }
-  .pulse-dot {
-    animation: pulse-dot 2.6s ease-in-out infinite;
-  }
-
-  /* Micro-animations — all killed by the reduced-motion block above */
-  @keyframes scroll-bob {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(4px);
-    }
-  }
-  @keyframes palette-in {
-    from {
-      opacity: 0;
-    }
-  }
-  @keyframes panel-in {
-    from {
-      opacity: 0;
-      transform: translateY(-8px) scale(0.985);
-    }
+  kbd {
+    font: inherit;
+    font-size: 0.85em;
+    padding: 1px 5px;
+    border: 1px solid var(--color-hairline);
+    border-bottom-width: 2px;
   }
 
   .sr-only {
@@ -238,57 +117,193 @@
     white-space: nowrap;
     border-width: 0;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 @layer components {
-  .quiet-link {
-    color: var(--color-fg-secondary);
-    transition: color 0.2s;
+  /* ---- Type roles ---- */
+  .t-name {
+    font-size: var(--text-name);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 0.86;
+    font-variation-settings: "opsz" 96;
   }
-  .quiet-link:hover {
-    color: var(--color-fg);
+  .t-title {
+    font-size: var(--text-title);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 0.92;
+    text-wrap: balance;
+  }
+  .t-row {
+    font-size: var(--text-row);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .t-row-sm {
+    font-size: var(--text-row-sm);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+  .t-meta {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-fg-muted);
   }
 
-  /* Work-index accordion rows — hover tints the whole row edge-to-edge and nudges text in */
-  .case-row {
-    cursor: pointer;
-    color: var(--color-fg);
-    margin-inline: -20px;
-    padding-inline: 20px;
-    transition:
-      background 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-      color 0.35s ease,
-      padding 0.35s ease;
+  .gutter {
+    padding-inline: var(--gutter);
   }
-  .case-row:hover {
-    background: var(--color-panel);
-    color: var(--color-panel-fg);
-    padding-left: 40px;
+
+  /* ---- Dots ---- */
+  .dot {
+    display: inline-block;
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 50%;
+    background: currentColor;
+    vertical-align: baseline;
   }
-  @media (min-width: 640px) {
-    .case-row {
-      margin-inline: -30px;
-      padding-inline: 30px;
+  .dot[data-live="true"] {
+    background: var(--color-live);
+  }
+  .dot-sm {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+  .dot-sm[data-live="true"] {
+    background: var(--color-live);
+  }
+
+  /* ---- Name: the dot is the full stop; clipped open by the arrival ---- */
+  .name-dot {
+    display: inline-block;
+    width: 0.14em;
+    height: 0.14em;
+    border-radius: 50%;
+    background: currentColor;
+    margin-left: 0.04em;
+    transform: translateY(-0.02em);
+  }
+  .name-dot[data-live="true"] {
+    background: var(--color-live);
+  }
+  html[data-arrive] .arrive-hidden {
+    visibility: hidden;
+  }
+
+  /* ---- Marquee: CSS animation, playbackRate nudged by scroll velocity ---- */
+  .marquee {
+    display: flex;
+    overflow: hidden;
+    white-space: nowrap;
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 2.5em;
+    padding-right: 2.5em;
+    flex-shrink: 0;
+    animation: marquee 48s linear infinite;
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-100%);
     }
   }
-  .case-plus {
-    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* ---- Tree ---- */
+  .trunk {
+    position: absolute;
+    left: calc(var(--gutter) - 1px);
+    width: 1px;
+    background: var(--color-fg);
+    pointer-events: none;
+    transform-origin: top;
   }
-  .case-row[data-open] .case-plus {
-    transform: rotate(45deg);
+
+  /* A row rule that grows from the trunk when the row enters view */
+  .branch {
+    position: absolute;
+    left: calc(-1 * var(--gutter));
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--color-fg);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s var(--ease-out);
+    pointer-events: none;
   }
-  /*
-    Expanding case study. The row animates from 0fr to 1fr so an open panel
-    is exactly as tall as its content. A fixed max-height silently clipped
-    the tallest case study on narrow phones.
-  */
+  .branch[data-drawn="true"] {
+    transform: scaleX(1);
+  }
+  .branch[data-open="true"] {
+    height: 2px;
+  }
+  .branch[data-shake="true"] {
+    animation: branch-shake 0.3s ease-out;
+  }
+  @keyframes branch-shake {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    30% {
+      translate: 0 -2px;
+    }
+    65% {
+      translate: 0 2px;
+    }
+  }
+
+  /* ---- Rows ---- */
+  .row {
+    position: relative;
+    display: grid;
+    width: 100%;
+    text-align: left;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    text-decoration: none;
+  }
+  .row-name {
+    transition: transform 0.45s var(--ease-out);
+  }
+  .row:hover .row-name,
+  .row:focus-visible .row-name {
+    transform: translateX(0.12em);
+  }
+
+  /* Case study that opens in place; 0fr → 1fr so the panel is exactly its content's height */
   .case-panel {
     display: grid;
     grid-template-rows: 0fr;
     opacity: 0;
     transition:
-      grid-template-rows 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.5s ease;
+      grid-template-rows 0.55s var(--ease-out),
+      opacity 0.4s ease;
   }
   .case-panel > * {
     overflow: hidden;
@@ -299,56 +314,50 @@
     opacity: 1;
   }
 
-  /* Notes-index rows — the row nudges in and tints on hover */
-  .note-index-row {
-    color: var(--color-fg);
-    transition:
-      color 0.3s ease,
-      padding 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  /* Floating screenshot that follows the pointer over a row */
+  .peek {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 30;
+    width: clamp(260px, 32vw, 480px);
+    aspect-ratio: 16 / 9;
+    pointer-events: none;
+    overflow: hidden;
+    visibility: hidden;
+    will-change: transform, clip-path;
   }
-  .note-index-row:hover {
-    color: var(--color-accent);
-    padding-left: 14px;
+  .peek[data-visible="true"] {
+    visibility: visible;
+  }
+  .peek img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
   }
 
-  /* Entry link icons (globe, X, Product Hunt) — subtle lift on hover */
-  .entry-icon {
+  /* Plain links: underline is the only decoration */
+  .link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+    text-decoration-color: var(--color-hairline);
+    transition: text-decoration-color 0.2s ease;
+  }
+  .link:hover {
+    text-decoration-color: currentColor;
+  }
+  .link-live {
     display: inline-flex;
-    opacity: 0.85;
-    transition:
-      opacity 0.2s,
-      transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .entry-icon:hover {
-    opacity: 1;
-    transform: translateY(-2px);
+    align-items: center;
+    gap: 7px;
   }
 
-  .chip {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    line-height: 1;
-    color: var(--color-fg-muted);
-    border: 1px solid var(--color-hairline);
-    border-radius: 999px;
-    padding: 3px 8px;
-    transition:
-      color 0.2s,
-      background 0.2s,
-      border-color 0.2s;
-  }
-  /* Interactive chips (tag filters) lift on hover */
-  .chip-btn:hover {
-    color: var(--color-fg-secondary);
-    border-color: var(--color-fg-muted);
-  }
-
-  /*
-    Fixed header. Transparent over the hero, then takes on a blurred surface
-    once the page scrolls so section content never reads through the labels.
-  */
+  /* ---- Nav ---- */
   .nav-bar {
-    color: var(--color-fg);
     background: transparent;
     border-bottom: 1px solid transparent;
     transition:
@@ -356,141 +365,221 @@
       border-color 0.3s ease;
   }
   .nav-bar[data-scrolled="true"] {
-    background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+    background: color-mix(in srgb, var(--color-bg) 88%, transparent);
     border-bottom-color: var(--color-hairline);
   }
-
-  /* Header nav links — dim until their section is active (scroll-spy) */
-  .header-link {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    opacity: 0.55;
-    transition: opacity 0.35s ease;
+  .nav-link {
+    position: relative;
+    color: inherit;
+    text-decoration: none;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
   }
-  .header-link:hover,
-  .header-link[data-active="true"] {
+  .nav-link:hover,
+  .nav-link[data-active="true"] {
     opacity: 1;
   }
-  .header-link-dot {
-    display: inline-block;
-    width: 4px;
-    height: 4px;
+  .nav-dot {
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
     background: currentColor;
     opacity: 0;
-    transition: opacity 0.35s ease;
+    transition:
+      transform 0.5s var(--ease-out),
+      opacity 0.3s ease;
   }
-  .header-link[data-active="true"] .header-link-dot {
+  .nav-dot[data-visible="true"] {
     opacity: 1;
   }
 
-  /* Nav theme toggle — border tracks the header's current (theme-aware) color */
-  .nav-toggle-btn {
-    position: relative;
-    border-color: color-mix(in srgb, currentColor 45%, transparent);
-    transition:
-      border-color 0.2s ease,
-      color 0.3s ease;
-  }
-  /*
-    On phones the label is hidden, leaving a 24x20 mark. Stretch the touch
-    target out to ~44px without growing what is drawn.
-  */
-  .nav-toggle-btn::after {
-    content: "";
+  /* ---- Roots (aerial), tangle, and the sway ---- */
+  .roots-svg {
     position: absolute;
-    inset: -14px;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+    color: var(--color-fg);
+    transform: skewX(calc(var(--gust, 0) * 1deg));
+    transition: transform 0.4s ease-out;
   }
-  .nav-toggle-btn:hover {
-    border-color: currentColor;
+  .roots-svg path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .roots-sway {
+    transform-box: fill-box;
+    transform-origin: 50% 0;
+    animation: sway 9s ease-in-out infinite alternate;
+  }
+  .roots-sway:nth-child(2n) {
+    animation-duration: 11s;
+    animation-delay: -4s;
+  }
+  .roots-sway:nth-child(3n) {
+    animation-duration: 8s;
+    animation-delay: -2s;
+  }
+  @keyframes sway {
+    from {
+      transform: rotate(-1.2deg);
+    }
+    to {
+      transform: rotate(1.2deg);
+    }
   }
 
-  /* Section label — picks up the accent while its section is active */
-  .section-label[data-active="true"] {
-    color: var(--color-accent);
+  /* ---- Warli figure: flames flicker only while hovered ---- */
+  .warli {
+    color: var(--color-fg);
+  }
+  .warli path,
+  .warli circle,
+  .warli line {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .warli .flame {
+    opacity: 0;
+  }
+  .warli .flame:first-child {
+    opacity: 1;
+  }
+  .warli:hover .flame,
+  .warli:focus-within .flame {
+    animation: flicker 0.54s steps(1) infinite;
+  }
+  .warli:hover .flame:nth-child(2),
+  .warli:focus-within .flame:nth-child(2) {
+    animation-delay: -0.18s;
+  }
+  .warli:hover .flame:nth-child(3),
+  .warli:focus-within .flame:nth-child(3) {
+    animation-delay: -0.36s;
+  }
+  @keyframes flicker {
+    0% {
+      opacity: 1;
+    }
+    33.3% {
+      opacity: 0;
+    }
   }
 
-  /* Hero scroll cue — gentle looping bob */
-  .scroll-cue {
-    display: inline-block;
-    animation: scroll-bob 2.4s ease-in-out infinite;
+  /* ---- Contact: lines resolve into the dot as the section enters ---- */
+  .resolve path {
+    fill: none;
+    stroke: var(--color-fg);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 0.8s var(--ease-out);
+  }
+  .resolve[data-drawn="true"] path {
+    stroke-dashoffset: 0;
+  }
+  .resolve circle {
+    fill: var(--color-fg);
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0);
+    transition: transform 0.4s 0.7s var(--ease-out);
+  }
+  .resolve[data-drawn="true"] circle {
+    transform: scale(1);
   }
 
-  /* Command palette entrance */
+  /* ---- Notes filter and search ---- */
+  .filter-btn {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    background: none;
+    border: 0;
+    padding: 4px 0;
+    color: var(--color-fg-muted);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 0.2em;
+    transition:
+      color 0.2s,
+      text-decoration-color 0.2s;
+  }
+  .filter-btn:hover,
+  .filter-btn[aria-selected="true"] {
+    color: var(--color-fg);
+    text-decoration-color: currentColor;
+  }
+
+  /* ---- Command palette ---- */
   .palette-backdrop {
     animation: palette-in 0.18s ease both;
   }
-  .palette-panel {
-    animation: panel-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+  @keyframes palette-in {
+    from {
+      opacity: 0;
+    }
   }
 
-  /* Arrow links — the glyph nudges toward its direction on hover */
-  .arrow {
-    display: inline-block;
-    transition: transform 0.3s cubic-bezier(0.22, 1.4, 0.36, 1);
-  }
-  .arrow-link:hover .arrow {
-    transform: translateX(3px);
-  }
-  .arrow-link.diag:hover .arrow {
-    transform: translate(2px, -2px);
-  }
-
-  /* Rendered markdown */
+  /* ---- Rendered markdown ---- */
   .note-prose {
-    color: var(--color-fg-body);
-    font-size: 15.5px;
-    line-height: 1.75;
+    font-size: 17px;
+    line-height: 1.6;
+    max-width: 60ch;
   }
   .note-prose h2 {
-    color: var(--color-fg);
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 600;
-    letter-spacing: -0.01em;
-    margin: 2.2em 0 0.6em;
+    letter-spacing: -0.02em;
+    margin: 2em 0 0.5em;
   }
   .note-prose h3 {
-    color: var(--color-fg);
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
-    margin: 1.8em 0 0.5em;
+    margin: 1.6em 0 0.4em;
   }
   .note-prose p {
     margin: 0 0 1.1em;
   }
   .note-prose a {
-    color: var(--color-accent);
+    color: inherit;
     text-decoration: underline;
     text-underline-offset: 3px;
-    text-decoration-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
   }
   .note-prose strong {
-    color: var(--color-fg);
-    font-weight: 500;
+    font-weight: 600;
   }
   .note-prose code {
-    font-family: var(--font-mono);
+    font-family: var(--font-mono), ui-monospace, monospace;
     font-size: 0.86em;
-    background: var(--color-bg-raised);
     border: 1px solid var(--color-hairline);
-    border-radius: 4px;
     padding: 0.1em 0.35em;
   }
   .note-prose pre {
-    background: var(--color-bg-raised);
     border: 1px solid var(--color-hairline);
-    border-radius: 8px;
     padding: 16px;
     overflow-x: auto;
     margin: 0 0 1.4em;
   }
   .note-prose pre code {
-    background: none;
     border: none;
     padding: 0;
     font-size: 13px;
     line-height: 1.6;
-    color: var(--color-fg);
   }
   .note-prose ul,
   .note-prose ol {
@@ -501,7 +590,7 @@
     margin-bottom: 0.35em;
   }
   .note-prose blockquote {
-    border-left: 2px solid var(--color-hairline);
+    border-left: 1px solid var(--color-fg);
     margin: 0 0 1.1em;
     padding-left: 1em;
     color: var(--color-fg-muted);
@@ -511,14 +600,14 @@
     border-top: 1px solid var(--color-hairline);
     margin: 2em 0;
   }
-  /* End-of-article mark */
+  /* End of article: the dot */
   .note-prose::after {
     content: "";
     display: block;
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: var(--color-accent);
-    margin: 2.5em auto 0;
+    background: var(--color-fg);
+    margin: 3em 0 0;
   }
 }

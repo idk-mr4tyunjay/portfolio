@@ -43,8 +43,9 @@ export function CommandPalette() {
   );
 
   const actions: Action[] = [
-    { id: "work", label: "go to work", hint: "scroll", run: () => scrollTo("index") },
-    { id: "projects", label: "go to projects", hint: "scroll", run: () => scrollTo("selected") },
+    { id: "work", label: "go to work", hint: "scroll", run: () => scrollTo("work") },
+    { id: "about", label: "go to about", hint: "scroll", run: () => scrollTo("about") },
+    { id: "projects", label: "go to side projects", hint: "scroll", run: () => scrollTo("side") },
     { id: "contact", label: "go to contact", hint: "scroll", run: () => scrollTo("contact") },
     {
       id: "notes",
@@ -110,17 +111,17 @@ export function CommandPalette() {
   return (
     <div
       className="palette-backdrop fixed inset-0 z-50 flex items-start justify-center px-6 pt-[18vh]"
-      style={{ background: "rgba(0, 0, 0, 0.6)" }}
+      style={{ background: "color-mix(in srgb, var(--color-bg) 70%, transparent)" }}
       onClick={close}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
-        className="palette-panel w-full max-w-md overflow-hidden rounded-lg"
+        className="w-full max-w-md overflow-hidden"
         style={{
           background: "var(--color-bg)",
-          border: "1px solid var(--color-hairline)",
+          border: "1px solid var(--color-fg)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -147,7 +148,6 @@ export function CommandPalette() {
           }}
           className="w-full bg-transparent px-4 py-3 text-sm outline-none"
           style={{
-            fontFamily: "var(--font-mono)",
             color: "var(--color-fg)",
             borderBottom: "1px solid var(--color-hairline)",
           }}
@@ -158,7 +158,7 @@ export function CommandPalette() {
               className="px-4 py-2 text-sm"
               style={{ color: "var(--color-fg-muted)" }}
             >
-              nothing matches. probably a me problem.
+              nothing matches.
             </li>
           )}
           {filtered.map((action, index) => (
@@ -181,7 +181,6 @@ export function CommandPalette() {
                 <span
                   className="text-xs"
                   style={{
-                    fontFamily: "var(--font-mono)",
                     color: "var(--color-fg-muted)",
                   }}
                 >
@@ -194,7 +193,6 @@ export function CommandPalette() {
         <p
           className="px-4 py-2 text-[11px]"
           style={{
-            fontFamily: "var(--font-mono)",
             color: "var(--color-fg-muted)",
             borderTop: "1px solid var(--color-hairline)",
           }}

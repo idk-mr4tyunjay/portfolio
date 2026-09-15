@@ -3,14 +3,15 @@ import { fontVariables } from "@/lib/fonts";
 import { Analytics } from "@/components/Analytics";
 import { CommandPalette } from "@/components/home/CommandPalette";
 import { SmoothScroll } from "@/components/home/SmoothScroll";
+import { Weather } from "@/components/home/Weather";
 import { SITE } from "@/data/site";
 import "./globals.css";
 
 // Applied before hydration so a stored dark preference never flashes light.
 const THEME_SCRIPT = `try{if(localStorage.getItem("mj-theme")==="dark")document.documentElement.dataset.theme="dark"}catch(e){}`;
 
-// Decides the hero intro loader before first paint, so it's never a beat behind (Hero.tsx reads this).
-const INTRO_SCRIPT = `try{if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches&&!sessionStorage.getItem("mj-intro")){sessionStorage.setItem("mj-intro","1");document.documentElement.setAttribute("data-show-intro","")}}catch(e){}`;
+// Decides the arrival (SPEC.md §4.0) before first paint: once per session, never under reduced motion.
+const ARRIVE_SCRIPT = `try{if(location.pathname==="/"&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches&&!sessionStorage.getItem("mj-arrived")){sessionStorage.setItem("mj-arrived","1");document.documentElement.setAttribute("data-arrive","")}}catch(e){}`;
 
 const TITLE = `${SITE.name} · ${SITE.role}`;
 
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     "web developer",
     "software engineer",
     "Next.js",
-    "React",
+    "React Native",
     "TypeScript",
     "portfolio",
   ],
@@ -72,8 +73,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#e9e7e1" },
-    { media: "(prefers-color-scheme: dark)", color: "#111110" },
+    { media: "(prefers-color-scheme: light)", color: "#f1f1ef" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -88,14 +89,12 @@ export default function RootLayout({
     <html lang="en" className={fontVariables} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
-        <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: ARRIVE_SCRIPT }} />
       </head>
-      <body
-        className="antialiased"
-        style={{ fontFamily: "var(--font-archivo)" }}
-      >
+      <body className="antialiased">
         <SmoothScroll />
         <div className="relative z-10">{children}</div>
+        <Weather />
         <CommandPalette />
         <Analytics />
       </body>

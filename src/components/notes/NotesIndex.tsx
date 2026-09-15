@@ -3,141 +3,70 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { NoteMeta } from "@/types";
+import { shortDate } from "@/lib/receipts";
 
 /*
-  Notes index. A tag-pill filter (single-select, "all" by default) narrows
-  the list; the search box further filters within that by title/summary/tag.
-  No dates are shown — the reader doesn't need them, sort order already
-  handles recency.
+  Notes index — SPEC.md §4.5 applied to the full list. A tag filter
+  (single-select, "all" by default) narrows the list; the search box filters
+  within that by title, summary or tag. Dated, newest first.
 */
 
 export function NotesIndex({ notes }: { notes: NoteMeta[] }) {
   const [query, setQuery] = useState("");
   const [activeTag, setActiveTag] = useState("all");
 
-  const allTags = useMemo(
-    () => ["all", ...new Set(notes.flatMap((note) => note.tags))].sort((a, b) => (a === "all" ? -1 : b === "all" ? 1 : a.localeCompare(b))),
-    [notes],
-  );
+  const allTags = useMemo(() => ["all", ...new Set(notes.flatMap((n) => n.tags))].sort((a, b) => (a === "all" ? -1 : b === "all" ? 1 : a.localeCompare(b))), [notes]);
 
   const q = query.trim().toLowerCase();
   const filtered = notes.filter((note) => {
     if (activeTag !== "all" && !note.tags.includes(activeTag)) return false;
     if (!q) return true;
-    return (
-      note.title.toLowerCase().includes(q) ||
-      note.summary.toLowerCase().includes(q) ||
-      note.tags.some((tag) => tag.toLowerCase().includes(q))
-    );
+    return note.title.toLowerCase().includes(q) || note.summary.toLowerCase().includes(q) || note.tags.some((t) => t.toLowerCase().includes(q));
   });
 
   return (
-    <section aria-label="Notes" className="relative px-5 pt-24 pb-16 sm:px-[30px]">
-      <div className="flex flex-wrap justify-between gap-7">
-        <p className="m-0 max-w-[30ch] text-[17px] leading-relaxed text-pretty" style={{ color: "var(--color-fg-secondary)" }}>
-          Things that broke, and what I learned before they broke again.
-        </p>
-        <p
-          className="m-0 text-right text-[10.5px] leading-[2] tracking-[0.18em] uppercase"
-          style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}
-        >
-          {String(notes.length).padStart(2, "0")} notes so far
-          <br />
-          updated as I break things
+    <section aria-label="Notes" className="gutter relative pt-28 pb-16 sm:pt-36">
+      <div className="flex flex-wrap items-end justify-between gap-6">
+        <h1 className="t-title m-0">What broke</h1>
+        <p className="t-meta m-0">
+          {notes.length} notes · dated, newest first
         </p>
       </div>
 
-      <div className="mt-5 overflow-hidden pb-[0.06em]">
-        <h1 className="m-0 font-bold" style={{ fontSize: "clamp(56px,12.5vw,196px)", lineHeight: 0.8, letterSpacing: "-0.05em" }}>
-          {"Notes".split("").map((letter, i) => (
-            <span
-              key={i}
-              className="inline-block"
-              style={{ animation: `letter-up 1s cubic-bezier(.16,1,.3,1) ${(0.05 * (i + 1)).toFixed(2)}s both` }}
-            >
-              {letter}
-            </span>
+      <div className="mt-10 grid gap-5 border-t border-[var(--color-hairline)] pt-5 sm:grid-cols-[minmax(0,1fr)_320px] sm:gap-10">
+        <div role="tablist" aria-label="Filter notes by topic" className="flex flex-wrap gap-x-5 gap-y-1">
+          {allTags.map((tag) => (
+            <button key={tag} type="button" role="tab" aria-selected={tag === activeTag} onClick={() => setActiveTag(tag)} className="filter-btn cursor-pointer" data-cursor="open">
+              {tag}
+            </button>
           ))}
-          <span
-            className="ml-1 inline-block"
-            style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontWeight: 400, animation: "letter-up 1s cubic-bezier(.16,1,.3,1) .32s both" }}
-          >
-            .
-          </span>
-        </h1>
-      </div>
-
-      <div className="relative mt-3.5 pt-4">
-        <span
-          aria-hidden
-          className="absolute inset-x-0 top-0 h-px origin-left"
-          style={{ background: "var(--color-hairline)", animation: "sweep-in 1.1s cubic-bezier(.16,1,.3,1) .5s both" }}
-        />
-        <div role="tablist" aria-label="Filter notes by topic" className="flex flex-wrap gap-2">
-          {allTags.map((tag) => {
-            const active = tag === activeTag;
-            return (
-              <button
-                key={tag}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setActiveTag(tag)}
-                className="chip chip-btn cursor-pointer"
-                style={active ? { color: "var(--color-bg)", background: "var(--color-fg)", borderColor: "var(--color-fg)" } : undefined}
-              >
-                {tag}
-              </button>
-            );
-          })}
         </div>
-
         <input
+          id="notes-search"
           type="search"
           aria-label="Search notes"
-          placeholder="search title, summary, tags…"
+          placeholder="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="mt-5 w-full max-w-[420px] bg-transparent py-2.5 text-[15px] outline-none"
-          style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg)", borderBottom: "1px solid var(--color-hairline)" }}
+          className="w-full border-0 border-b border-[var(--color-hairline)] bg-transparent py-1.5 text-[15px] outline-none focus-visible:border-[var(--color-fg)]"
         />
       </div>
 
-      <div className="mt-6" style={{ borderTop: "1px solid var(--color-hairline)" }}>
-        {filtered.length === 0 && (
-          <p className="m-0 py-14 text-[22px]" style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", color: "var(--color-fg-secondary)" }}>
-            Nothing filed under that topic yet.
-          </p>
-        )}
-        {filtered.map((note, index) => (
-          <Link
-            key={note.slug}
-            href={`/notes/${note.slug}`}
-            className="note-index-row grid grid-cols-[36px_1fr_auto] items-baseline gap-4 py-6 sm:grid-cols-[52px_minmax(0,1.7fr)_minmax(0,1.3fr)_150px_26px] sm:gap-6"
-            style={{ borderBottom: "1px solid var(--color-hairline)" }}
-          >
-            <span className="text-[34px] leading-[0.9] font-bold" style={{ color: "transparent", WebkitTextStroke: "1px var(--color-hairline)" }}>
-              {String(index + 1).padStart(2, "0")}
-            </span>
-            <span className="text-pretty" style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(21px,2.4vw,30px)", lineHeight: 1.12, letterSpacing: "-0.01em" }}>
-              {note.title}
-            </span>
-            <span className="col-span-2 hidden text-[14px] leading-relaxed text-pretty sm:col-span-1 sm:block" style={{ color: "var(--color-fg-secondary)" }}>
-              {note.summary}
-            </span>
-            <span className="hidden flex-wrap gap-1.5 sm:flex">
-              {note.tags.map((tag) => (
-                <span key={tag} className="text-[9.5px] tracking-[0.12em] uppercase" style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}>
-                  {tag}
-                </span>
-              ))}
-            </span>
-            <span className="justify-self-end text-[13px] opacity-65 sm:justify-self-auto" style={{ fontFamily: "var(--font-mono)" }}>
-              →
-            </span>
-          </Link>
+      <ol className="m-0 mt-10 list-none p-0">
+        {filtered.length === 0 && <li className="t-meta py-10">Nothing filed under that yet.</li>}
+        {filtered.map((note) => (
+          <li key={note.slug} className="border-t border-[var(--color-hairline)]">
+            <Link href={`/notes/${note.slug}`} className="row grid-cols-1 gap-2 py-6 sm:grid-cols-[120px_minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-baseline sm:gap-8" data-cursor="open">
+              <time dateTime={note.date} className="t-meta text-[var(--color-fg)]">
+                {shortDate(note.date)}
+              </time>
+              <span className="row-name t-row-sm block max-w-[24ch]">{note.title}</span>
+              <span className="max-w-[44ch] text-[15px] leading-[1.45] text-[var(--color-fg-muted)]">{note.summary}</span>
+              <span className="t-meta sm:text-right">{note.tags.join(", ")}</span>
+            </Link>
+          </li>
         ))}
-      </div>
+      </ol>
     </section>
   );
 }
