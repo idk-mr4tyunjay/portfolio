@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { Nav } from "@/components/home/Nav";
 import { Footer } from "@/components/home/Footer";
 import { JsonLd } from "@/components/JsonLd";
-import { getAllNotes, getNote } from "@/lib/notes";
+import { getAllNotes, getAllNotesWithReadingTime, getNote } from "@/lib/notes";
+import styles from "@/components/notes/Notes.module.css";
 import { OG_IMAGE } from "@/lib/seo";
 import { SITE } from "@/data/site";
 
@@ -52,9 +53,15 @@ export default async function NotePage({
 }) {
   const note = getNote((await params).slug);
   if (!note) notFound();
+  const notes = getAllNotesWithReadingTime();
+  const noteIndex = notes.findIndex((item) => item.slug === note.meta.slug);
+  const nextNote = notes.length > 1 ? notes[(noteIndex + 1) % notes.length] : null;
+  const date = new Intl.DateTimeFormat("en-GB", {
+    day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+  }).format(new Date(`${note.meta.date}T00:00:00Z`));
 
   return (
-    <>
+    <div id="top">
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -72,41 +79,44 @@ export default async function NotePage({
         }}
       />
       <Nav />
-      <main>
-        <article className="mx-auto max-w-[720px] px-5 pt-24 pb-20 sm:px-6">
-          <Link
-            href="/notes"
-            className="quiet-link text-[13px]"
-            style={{ fontFamily: "var(--font-mono)" }}
-          >
-            ← notes
-          </Link>
-          <h1
-            className="mt-6 mb-3"
-            style={{
-              fontSize: "clamp(28px, 4.5vw, 40px)",
-              fontWeight: 600,
-              letterSpacing: "-0.02em",
-              lineHeight: 1.15,
-            }}
-          >
-            {note.meta.title}
-          </h1>
-          {note.meta.tags.length > 0 && (
-            <p
-              className="mb-10 text-xs"
-              style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}
-            >
-              {note.meta.tags.join(" · ")}
-            </p>
-          )}
-          <div
-            className="note-prose"
-            dangerouslySetInnerHTML={{ __html: note.html }}
-          />
+      <main id="main-content" className={styles.reader}>
+        <article>
+          <header className={styles.articleHeader}>
+            <Link href="/notes" className={styles.backLink}><span aria-hidden="true">←</span> All notes</Link>
+            <div className={styles.articleMeta}>
+              <time dateTime={note.meta.date}>{date}</time>
+              <span>{notes[noteIndex]?.read ?? "A short"} read</span>
+            </div>
+            <h1>{note.meta.title}</h1>
+            {note.meta.summary && <p className={styles.articleSummary}>{note.meta.summary}</p>}
+          </header>
+          <div className={styles.readingLayout}>
+            <aside className={styles.articleAside} aria-label="About this note">
+              <span className={styles.authorMark} aria-hidden="true">m.</span>
+              <p>{SITE.name}</p>
+              <span>Developer &amp; curious person</span>
+              <div className={styles.articleTags}>
+                {note.meta.tags.map((tag) => <span key={tag}>{tag}</span>)}
+              </div>
+            </aside>
+            <div>
+              <div className={styles.prose} dangerouslySetInnerHTML={{ __html: note.html }} />
+              <div className={styles.articleEnd}>
+                <span aria-hidden="true">✳</span>
+                <p>Found something I missed?<br /><a href={`mailto:${SITE.email}?subject=${encodeURIComponent(note.meta.title)}`}>I&apos;d love to hear it.</a></p>
+              </div>
+              {nextNote && (
+                <Link href={`/notes/${nextNote.slug}`} className={styles.nextNote}>
+                  <span>Another page in the notebook</span>
+                  <h2>{nextNote.title}</h2>
+                  <span aria-hidden="true" className={styles.nextArrow}>↗</span>
+                </Link>
+              )}
+            </div>
+          </div>
         </article>
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

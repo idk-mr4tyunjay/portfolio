@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
 import { SITE } from "@/data/site";
+import { WORK_ENTRIES } from "@/data/work";
 import { getAllNotes } from "@/lib/notes";
 
 /*
-  Sitemap — generated at build. Static routes + every note.
+  Sitemap — generated at build. Static routes, projects, and every note.
   Served at /sitemap.xml and referenced from robots.ts.
 */
 
@@ -15,6 +16,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: note.date ? new Date(note.date) : now,
     changeFrequency: "yearly",
     priority: 0.6,
+  }));
+
+  const work: MetadataRoute.Sitemap = WORK_ENTRIES.map((entry) => ({
+    url: `${SITE.url}/work/${entry.slug}`,
+    changeFrequency: "monthly",
+    priority: entry.kind === "work" ? 0.8 : 0.6,
   }));
 
   return [
@@ -30,6 +37,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.8,
     },
+    ...work,
     ...notes,
   ];
 }

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SITE } from "@/data/site";
+import { WORK_ENTRIES } from "@/data/work";
 import { smoothScrollTo } from "@/lib/scroll";
 
 /*
@@ -14,6 +15,7 @@ interface Action {
   id: string;
   label: string;
   hint: string;
+  keywords?: string;
   run: () => void;
 }
 
@@ -22,13 +24,14 @@ export function CommandPalette() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const resultsRef = useRef<HTMLUListElement>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);
 
   const close = useCallback(() => {
     setOpen(false);
     setQuery("");
     setSelected(0);
-    restoreFocusRef.current?.focus();
   }, []);
 
   const scrollTo = useCallback(
@@ -55,6 +58,16 @@ export function CommandPalette() {
         close();
       },
     },
+    ...WORK_ENTRIES.map((entry): Action => ({
+      id: `project-${entry.slug}`,
+      label: `view ${entry.name}`,
+      hint: "project",
+      keywords: [entry.discipline, entry.summary, ...(entry.products?.map((product) => product.name) ?? [])].join(" "),
+      run: () => {
+        window.location.href = `/work/${entry.slug}`;
+        close();
+      },
+    })),
     {
       id: "github",
       label: "open github",
@@ -76,34 +89,51 @@ export function CommandPalette() {
   ];
 
   const filtered = actions.filter((a) =>
-    a.label.toLowerCase().includes(query.trim().toLowerCase()),
+    `${a.label} ${a.keywords ?? ""}`.toLowerCase().includes(query.trim().toLowerCase()),
   );
   const clampedSelected = Math.min(selected, Math.max(0, filtered.length - 1));
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (open && e.key === "Escape") {
+        e.preventDefault();
+        close();
+        return;
+      }
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        setOpen((prev) => {
-          if (!prev) {
-            restoreFocusRef.current =
-              document.activeElement as HTMLElement | null;
-          } else {
-            restoreFocusRef.current?.focus();
-          }
-          return !prev;
-        });
-        setQuery("");
-        setSelected(0);
+        if (open) close();
+        else {
+          restoreFocusRef.current = document.activeElement as HTMLElement | null;
+          setOpen(true);
+        }
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [open, close]);
 
   useEffect(() => {
-    if (open) inputRef.current?.focus();
+    if (!open) return;
+    const previous = restoreFocusRef.current;
+    inputRef.current?.focus({ preventScroll: true });
+    const containFocus = (event: FocusEvent) => {
+      if (!panelRef.current?.contains(event.target as Node)) {
+        inputRef.current?.focus({ preventScroll: true });
+      }
+    };
+    document.addEventListener("focusin", containFocus);
+    return () => {
+      document.removeEventListener("focusin", containFocus);
+      if (previous?.isConnected) previous.focus({ preventScroll: true });
+    };
   }, [open]);
+
+  useEffect(() => {
+    if (open) {
+      resultsRef.current?.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: "nearest" });
+    }
+  }, [open, clampedSelected, query]);
 
   if (!open) return null;
 
@@ -114,6 +144,7 @@ export function CommandPalette() {
       onClick={close}
     >
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
@@ -123,19 +154,33 @@ export function CommandPalette() {
           border: "1px solid var(--color-hairline)",
         }}
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => {
+          if (e.key !== "Tab") return;
+          const controls = Array.from(e.currentTarget.querySelectorAll<HTMLElement>("input, button, a[href], [tabindex='0']"))
+            .filter((element) => !element.hasAttribute("disabled") && element.getClientRects().length > 0);
+          if (controls.length === 0) return;
+          e.preventDefault();
+          const current = controls.indexOf(document.activeElement as HTMLElement);
+          const next = (current + (e.shiftKey ? -1 : 1) + controls.length) % controls.length;
+          controls[next].focus({ preventScroll: true });
+          controls[next].scrollIntoView({ block: "nearest" });
+        }}
       >
         <input
           ref={inputRef}
+          role="combobox"
+          aria-expanded={open}
+          aria-controls="palette-results"
+          aria-activedescendant={filtered[clampedSelected] ? `palette-${filtered[clampedSelected].id}` : undefined}
           aria-label="Search commands"
-          placeholder="type a command"
+          placeholder="Search projects, pages, or commands"
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
             setSelected(0);
           }}
           onKeyDown={(e) => {
-            if (e.key === "Escape") close();
-            else if (e.key === "ArrowDown") {
+            if (e.key === "ArrowDown") {
               e.preventDefault();
               setSelected((s) => Math.min(s + 1, filtered.length - 1));
             } else if (e.key === "ArrowUp") {
@@ -152,17 +197,17 @@ export function CommandPalette() {
             borderBottom: "1px solid var(--color-hairline)",
           }}
         />
-        <ul role="listbox" aria-label="Commands" className="py-1">
+        <ul ref={resultsRef} id="palette-results" role="listbox" aria-label="Commands" className="max-h-[min(55vh,440px)] overflow-y-auto py-1">
           {filtered.length === 0 && (
             <li
               className="px-4 py-2 text-sm"
               style={{ color: "var(--color-fg-muted)" }}
             >
-              nothing matches. probably a me problem.
+              No matching pages or commands.
             </li>
           )}
           {filtered.map((action, index) => (
-            <li key={action.id} role="option" aria-selected={index === clampedSelected}>
+            <li key={action.id} id={`palette-${action.id}`} role="option" aria-selected={index === clampedSelected}>
               <button
                 type="button"
                 onClick={action.run}

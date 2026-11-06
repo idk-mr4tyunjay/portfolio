@@ -6,12 +6,6 @@ import { SmoothScroll } from "@/components/home/SmoothScroll";
 import { SITE } from "@/data/site";
 import "./globals.css";
 
-// Applied before hydration so a stored dark preference never flashes light.
-const THEME_SCRIPT = `try{if(localStorage.getItem("mj-theme")==="dark")document.documentElement.dataset.theme="dark"}catch(e){}`;
-
-// Decides the hero intro loader before first paint, so it's never a beat behind (Hero.tsx reads this).
-const INTRO_SCRIPT = `try{if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches&&!sessionStorage.getItem("mj-intro")){sessionStorage.setItem("mj-intro","1");document.documentElement.setAttribute("data-show-intro","")}}catch(e){}`;
-
 const TITLE = `${SITE.name} · ${SITE.role}`;
 
 export const metadata: Metadata = {
@@ -71,10 +65,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#e9e7e1" },
-    { media: "(prefers-color-scheme: dark)", color: "#111110" },
-  ],
+  themeColor: "#f1f0ea",
   width: "device-width",
   initialScale: 1,
 };
@@ -86,14 +77,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={fontVariables} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
-        <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
-      </head>
       <body
         className="antialiased"
         style={{ fontFamily: "var(--font-archivo)" }}
       >
+        <a href="#main-content" className="skip-link">Skip to content</a>
         <SmoothScroll />
         <div className="relative z-10">{children}</div>
         <CommandPalette />

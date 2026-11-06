@@ -1,51 +1,22 @@
 import Link from "next/link";
 import { Nav } from "@/components/home/Nav";
+import { Footer } from "@/components/home/Footer";
+import styles from "@/components/notes/Notes.module.css";
 
 export default function NotFound() {
   return (
-    <div className="mx-auto max-w-[820px] px-6">
+    <div id="top">
       <Nav />
-      <main className="flex min-h-[70vh] flex-col justify-center pb-14">
-        <h1
-          className="fade-up m-0"
-          style={{
-            fontSize: "clamp(44px, 8vw, 76px)",
-            fontWeight: 500,
-            letterSpacing: "-0.03em",
-            lineHeight: 1.05,
-          }}
-        >
-          404
-        </h1>
-        <p
-          className="fade-up mt-3 text-[13px]"
-          style={{
-            fontFamily: "var(--font-mono)",
-            color: "var(--color-fg-muted)",
-            animationDelay: "0.05s",
-          }}
-        >
-          idk where that went either · it&apos;s literally in my username
-        </p>
-        <p
-          className="fade-up mt-8 max-w-[52ch] text-[16px] leading-relaxed"
-          style={{ color: "var(--color-fg-secondary)", animationDelay: "0.1s" }}
-        >
-          This page doesn&apos;t exist. Could be a typo, could be a link I broke
-          and wrote a note about instead of fixing. Both are on brand.
-        </p>
-        <p
-          className="fade-up mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-[15px]"
-          style={{ animationDelay: "0.15s" }}
-        >
-          <Link href="/" className="quiet-link arrow-link" style={{ color: "var(--color-accent)" }}>
-            go home <span className="arrow">→</span>
-          </Link>
-          <Link href="/notes" className="quiet-link arrow-link" style={{ color: "var(--color-accent)" }}>
-            read the notes <span className="arrow">→</span>
-          </Link>
-        </p>
+      <main id="main-content" className={styles.notFound}>
+        <span className={styles.errorCode}>404</span>
+        <h1>A little off the map.</h1>
+        <p>This page doesn&apos;t exist. The link may have changed, or there may be a typo in the address.</p>
+        <div>
+          <Link href="/">Back to the portfolio <span aria-hidden="true">↗</span></Link>
+          <Link href="/notes">Browse the notes <span aria-hidden="true">↗</span></Link>
+        </div>
       </main>
+      <Footer />
     </div>
   );
 }

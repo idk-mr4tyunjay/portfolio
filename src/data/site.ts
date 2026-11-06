@@ -9,6 +9,7 @@ export const SITE = {
   url: "https://mruthunjay.xyz",
   /** One-line tagline reused across metadata (title/description/OG). */
   tagline: "Full-stack developer building fast, honest things for the web.",
+  heroHeadline: { lead: "From an idea to", continuation: "something you can use." },
   github: "https://github.com/idk-mr4tyunjay",
   linkedin: "https://www.linkedin.com/in/mruthunj4y/",
   producthunt: "https://www.producthunt.com/@idk_mr4tyunjay",

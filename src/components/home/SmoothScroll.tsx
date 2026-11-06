@@ -11,25 +11,31 @@ import Lenis from "lenis";
 */
 export function SmoothScroll() {
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const lenis = new Lenis({
-      duration: 1.1,
-      easing: (t) => 1 - Math.pow(1 - t, 3),
-    });
-    window.__lenis = lenis;
-
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let lenis: Lenis | undefined;
     let raf = 0;
-    const loop = (time: number) => {
-      lenis.raf(time);
+    const stop = () => {
+      cancelAnimationFrame(raf);
+      lenis?.destroy();
+      lenis = undefined;
+      delete window.__lenis;
+    };
+    const update = () => {
+      stop();
+      if (preference.matches) return;
+      lenis = new Lenis({ duration: 1.1, easing: (t) => 1 - Math.pow(1 - t, 3) });
+      window.__lenis = lenis;
+      const loop = (time: number) => {
+        lenis?.raf(time);
+        raf = requestAnimationFrame(loop);
+      };
       raf = requestAnimationFrame(loop);
     };
-    raf = requestAnimationFrame(loop);
-
+    update();
+    preference.addEventListener("change", update);
     return () => {
-      cancelAnimationFrame(raf);
-      lenis.destroy();
-      delete window.__lenis;
+      preference.removeEventListener("change", update);
+      stop();
     };
   }, []);
 

@@ -2,21 +2,25 @@
   "name": "portfolio",
   "version": "0.1.0",
   "private": true,
-  "description": "Minimal, content-first developer portfolio built with Next.js and React.",
+  "description": "Illustrated studio portfolio with selected work, project pages and a searchable notebook.",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint src next.config.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
     "lenis": "^1.3.26",
     "marked": "^15.0.12",
-    "next": "^15.1.6",
+    "next": "^15.5.29",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "three": "^0.187.0"
+  },
+  "overrides": {
+    "next": { "postcss": "^8.5.32" }
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -24,6 +28,7 @@
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
+    "@types/three": "^0.187.0",
     "eslint": "^9.18.0",
     "eslint-config-next": "^15.1.6",
     "postcss": "^8.5.1",

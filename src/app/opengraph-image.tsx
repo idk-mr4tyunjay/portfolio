@@ -14,11 +14,11 @@ import { SITE } from "@/data/site";
 const ARCHIVO_BOLD = readFileSync(join(process.cwd(), "src/assets/fonts/Archivo-Bold.ttf"));
 const MONO_REGULAR = readFileSync(join(process.cwd(), "src/assets/fonts/JetBrainsMono-Regular.ttf"));
 
-const BG = "#e9e7e1";
-const FG = "#141413";
-const MUTED = "rgba(20, 20, 19, 0.62)";
-const HAIRLINE = "rgba(20, 20, 19, 0.22)";
-const ACCENT = "#c93c0a";
+const BG = "#f1f0ea";
+const FG = "#35243b";
+const MUTED = "#665a69";
+const HAIRLINE = "#d7d0d7";
+const ACCENT = "#684f70";
 
 // Baked at build. The fonts are read off disk, which only exists then.
 export const dynamic = "force-static";
@@ -28,7 +28,7 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default function OpengraphImage() {
-  const tagline = `${SITE.heroTagline.lead} ${SITE.heroTagline.italic}`;
+  const tagline = `${SITE.heroHeadline.lead} ${SITE.heroHeadline.continuation}`;
 
   return new ImageResponse(
     (
