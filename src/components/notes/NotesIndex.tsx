@@ -3,140 +3,91 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { NoteMeta } from "@/types";
+import styles from "./Notes.module.css";
 
-/*
-  Notes index. A tag-pill filter (single-select, "all" by default) narrows
-  the list; the search box further filters within that by title/summary/tag.
-  No dates are shown — the reader doesn't need them, sort order already
-  handles recency.
-*/
+type NoteWithReadingTime = NoteMeta & { read: string };
 
-export function NotesIndex({ notes }: { notes: NoteMeta[] }) {
+export function NotesIndex({ notes }: { notes: NoteWithReadingTime[] }) {
   const [query, setQuery] = useState("");
   const [activeTag, setActiveTag] = useState("all");
-
   const allTags = useMemo(
-    () => ["all", ...new Set(notes.flatMap((note) => note.tags))].sort((a, b) => (a === "all" ? -1 : b === "all" ? 1 : a.localeCompare(b))),
+    () => ["all", ...Array.from(new Set(notes.flatMap((note) => note.tags))).sort()],
     [notes],
   );
-
-  const q = query.trim().toLowerCase();
+  const search = query.trim().toLowerCase();
   const filtered = notes.filter((note) => {
     if (activeTag !== "all" && !note.tags.includes(activeTag)) return false;
-    if (!q) return true;
-    return (
-      note.title.toLowerCase().includes(q) ||
-      note.summary.toLowerCase().includes(q) ||
-      note.tags.some((tag) => tag.toLowerCase().includes(q))
-    );
+    return !search || `${note.title} ${note.summary} ${note.tags.join(" ")}`.toLowerCase().includes(search);
   });
 
+  function clearFilters() {
+    setQuery("");
+    setActiveTag("all");
+  }
+
   return (
-    <section aria-label="Notes" className="relative px-5 pt-24 pb-16 sm:px-[30px]">
-      <div className="flex flex-wrap justify-between gap-7">
-        <p className="m-0 max-w-[30ch] text-[17px] leading-relaxed text-pretty" style={{ color: "var(--color-fg-secondary)" }}>
-          Things that broke, and what I learned before they broke again.
-        </p>
-        <p
-          className="m-0 text-right text-[10.5px] leading-[2] tracking-[0.18em] uppercase"
-          style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}
-        >
-          {String(notes.length).padStart(2, "0")} notes so far
-          <br />
-          updated as I break things
-        </p>
-      </div>
-
-      <div className="mt-5 overflow-hidden pb-[0.06em]">
-        <h1 className="m-0 font-bold" style={{ fontSize: "clamp(56px,12.5vw,196px)", lineHeight: 0.8, letterSpacing: "-0.05em" }}>
-          {"Notes".split("").map((letter, i) => (
-            <span
-              key={i}
-              className="inline-block"
-              style={{ animation: `letter-up 1s cubic-bezier(.16,1,.3,1) ${(0.05 * (i + 1)).toFixed(2)}s both` }}
-            >
-              {letter}
-            </span>
-          ))}
-          <span
-            className="ml-1 inline-block"
-            style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontWeight: 400, animation: "letter-up 1s cubic-bezier(.16,1,.3,1) .32s both" }}
-          >
-            .
-          </span>
-        </h1>
-      </div>
-
-      <div className="relative mt-3.5 pt-4">
-        <span
-          aria-hidden
-          className="absolute inset-x-0 top-0 h-px origin-left"
-          style={{ background: "var(--color-hairline)", animation: "sweep-in 1.1s cubic-bezier(.16,1,.3,1) .5s both" }}
-        />
-        <div role="tablist" aria-label="Filter notes by topic" className="flex flex-wrap gap-2">
-          {allTags.map((tag) => {
-            const active = tag === activeTag;
-            return (
-              <button
-                key={tag}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setActiveTag(tag)}
-                className="chip chip-btn cursor-pointer"
-                style={active ? { color: "var(--color-bg)", background: "var(--color-fg)", borderColor: "var(--color-fg)" } : undefined}
-              >
-                {tag}
-              </button>
-            );
-          })}
+    <section aria-labelledby="notes-title" className={styles.archive}>
+      <header>
+        <Link href="/" className={styles.backLink}><span aria-hidden="true">←</span> Back to the portfolio</Link>
+        <div className={styles.archiveIntro}>
+          <h1 id="notes-title">Working notes.</h1>
+          <p>Things I&apos;ve learned while building for the web.<br />Written down before I forget them.</p>
         </div>
+        <div className={styles.archiveCaption}>
+          <span>A small, growing collection</span>
+          <span>{String(notes.length).padStart(2, "0")} notes in the notebook</span>
+        </div>
+      </header>
 
-        <input
-          type="search"
-          aria-label="Search notes"
-          placeholder="search title, summary, tags…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="mt-5 w-full max-w-[420px] bg-transparent py-2.5 text-[15px] outline-none"
-          style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg)", borderBottom: "1px solid var(--color-hairline)" }}
-        />
-      </div>
-
-      <div className="mt-6" style={{ borderTop: "1px solid var(--color-hairline)" }}>
-        {filtered.length === 0 && (
-          <p className="m-0 py-14 text-[22px]" style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", color: "var(--color-fg-secondary)" }}>
-            Nothing filed under that topic yet.
-          </p>
-        )}
-        {filtered.map((note, index) => (
-          <Link
-            key={note.slug}
-            href={`/notes/${note.slug}`}
-            className="note-index-row grid grid-cols-[36px_1fr_auto] items-baseline gap-4 py-6 sm:grid-cols-[52px_minmax(0,1.7fr)_minmax(0,1.3fr)_150px_26px] sm:gap-6"
-            style={{ borderBottom: "1px solid var(--color-hairline)" }}
-          >
-            <span className="text-[34px] leading-[0.9] font-bold" style={{ color: "transparent", WebkitTextStroke: "1px var(--color-hairline)" }}>
-              {String(index + 1).padStart(2, "0")}
-            </span>
-            <span className="text-pretty" style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(21px,2.4vw,30px)", lineHeight: 1.12, letterSpacing: "-0.01em" }}>
-              {note.title}
-            </span>
-            <span className="col-span-2 hidden text-[14px] leading-relaxed text-pretty sm:col-span-1 sm:block" style={{ color: "var(--color-fg-secondary)" }}>
-              {note.summary}
-            </span>
-            <span className="hidden flex-wrap gap-1.5 sm:flex">
-              {note.tags.map((tag) => (
-                <span key={tag} className="text-[9.5px] tracking-[0.12em] uppercase" style={{ fontFamily: "var(--font-mono)", color: "var(--color-fg-muted)" }}>
-                  {tag}
-                </span>
+      <div className={styles.archiveBody}>
+        <aside className={styles.filters} aria-label="Find a note">
+          <label htmlFor="note-search" className={styles.filterLabel}>Find something</label>
+          <div className={styles.searchField}>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" width="18" height="18">
+              <circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" strokeWidth="1.5" />
+              <path d="m15.5 15.5 4.5 4.5" stroke="currentColor" strokeWidth="1.5" />
+            </svg>
+            <input id="note-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search notes" />
+          </div>
+          <div className={styles.topicFilter}>
+            <p className={styles.filterLabel}>Browse by topic</p>
+            <div role="group" aria-label="Filter notes by topic" className={styles.tags}>
+              {allTags.map((tag) => (
+                <button key={tag} type="button" aria-pressed={activeTag === tag} onClick={() => setActiveTag(tag)}>
+                  {tag === "all" ? "All notes" : tag}
+                  {tag === "all" && <span>{notes.length}</span>}
+                </button>
               ))}
-            </span>
-            <span className="justify-self-end text-[13px] opacity-65 sm:justify-self-auto" style={{ fontFamily: "var(--font-mono)" }}>
-              →
-            </span>
-          </Link>
-        ))}
+            </div>
+          </div>
+        </aside>
+
+        <div>
+          <p className={styles.resultCount} role="status" aria-live="polite">
+            {filtered.length === notes.length ? "The latest entries" : `${filtered.length} ${filtered.length === 1 ? "note" : "notes"} found`}
+          </p>
+          {filtered.length === 0 ? (
+            <div className={styles.empty}>
+              <h2>No notes found.</h2>
+              <p>Try a different search or browse all topics.</p>
+              <button type="button" onClick={clearFilters}>Clear filters <span aria-hidden="true">↗</span></button>
+            </div>
+          ) : (
+            <div>
+              {filtered.map((note) => (
+                <Link key={note.slug} href={`/notes/${note.slug}`} className={styles.archiveNote}>
+                  <div className={styles.noteMeta}>
+                    <span>{note.tags.join(" / ")}</span>
+                    <span>{note.read} read</span>
+                  </div>
+                  <h2>{note.title}</h2>
+                  <p>{note.summary}</p>
+                  <span className={styles.readLink}>Read note <span aria-hidden="true">↗</span></span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );

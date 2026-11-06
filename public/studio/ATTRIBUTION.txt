@@ -1,0 +1,11 @@
+Studio scene by Mruthunjay, 2026.
+
+Seated anatomy and cropped hair adapted from:
+Snow Rig (CC) Blender Foundation | studio.blender.org
+Source: https://studio.blender.org/characters/snow/v4/
+License: Creative Commons Attribution 4.0 International
+https://creativecommons.org/licenses/by/4.0/
+
+Modifications include an anonymous face, a new garment, adapted pose,
+custom furniture, two-tone materials, camera choreography, mesh reduction
+and batching for realtime WebGL. The source rig is not included in the web asset.

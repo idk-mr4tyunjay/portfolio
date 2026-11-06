@@ -1,123 +1,38 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useActiveSection } from "@/lib/useActiveSection";
 import { smoothScrollTo } from "@/lib/scroll";
 import { SECTION_IDS } from "@/lib/sections";
+import styles from "./Nav.module.css";
 
-/*
-  Fixed header. Themed via --color-fg so it flips with light/dark instead of
-  relying on mix-blend-mode (which washed out against the cream background).
-  Scroll-spy dots track whichever section is active; the theme toggle
-  persists to localStorage (the blocking script in layout.tsx applies it
-  before paint).
-*/
-
-const LINKS: { id: string; label: string }[] = [
-  { id: "index", label: "index" },
-  { id: "selected", label: "work" },
-  { id: "notes", label: "notes" },
-  { id: "contact", label: "contact" },
-];
+const links = [{ id: "index", label: "Work" }, { id: "about", label: "About" }, { id: "notes", label: "Notes" }, { id: "contact", label: "Contact" }];
 
 export function Nav() {
+  const pathname = usePathname();
   const active = useActiveSection(SECTION_IDS);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [clock, setClock] = useState("--:--");
   const [scrolled, setScrolled] = useState(false);
-
+  const [immersed, setImmersed] = useState(false);
   useEffect(() => {
-    setTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
-
-    // Once the page moves, the bar earns its own surface so it never sits
-    // bare on top of whatever section is passing underneath.
-    let raf = 0;
-    const checkScrolled = () => {
-      raf = 0;
-      setScrolled(window.scrollY > 16);
-    };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(checkScrolled);
-    };
-    checkScrolled();
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    const tick = () =>
-      setClock(
-        new Intl.DateTimeFormat("en-GB", {
-          timeZone: "Asia/Kolkata",
-          hour: "2-digit",
-          minute: "2-digit",
-        }).format(new Date()),
-      );
-    tick();
-    const id = setInterval(tick, 20000);
-    return () => {
-      clearInterval(id);
-      window.removeEventListener("scroll", onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
+    const scroll = () => setScrolled(window.scrollY > 20);
+    const immersion = (event: Event) => setImmersed((event as CustomEvent<boolean>).detail);
+    scroll();
+    window.addEventListener("scroll", scroll, { passive: true });
+    window.addEventListener("studio:immersion", immersion);
+    return () => { window.removeEventListener("scroll", scroll); window.removeEventListener("studio:immersion", immersion); };
   }, []);
-
-  const toggleTheme = () => {
-    const next = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    document.documentElement.dataset.theme = next;
-    try {
-      localStorage.setItem("mj-theme", next);
-    } catch {
-      // storage disabled — theme just won't persist across reloads
-    }
+  const go = (id: string) => (event: React.MouseEvent) => {
+    if (pathname === "/" && document.getElementById(id)) { event.preventDefault(); smoothScrollTo(id); }
   };
-
-  const go = (id: string) => (e: React.MouseEvent) => {
-    if (document.getElementById(id)) {
-      e.preventDefault();
-      smoothScrollTo(id);
-    }
-  };
-
   return (
-    <header
-      data-scrolled={scrolled}
-      className={`nav-bar fixed inset-x-0 top-0 z-40 grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 py-4 text-[9px] tracking-[0.14em] uppercase sm:gap-5 sm:px-[30px] sm:text-[10.5px] sm:tracking-[0.18em] ${
-        scrolled ? "backdrop-blur-xl backdrop-saturate-150" : ""
-      }`}
-      style={{ fontFamily: "var(--font-mono)" }}
-    >
-      <Link href="/" onClick={go("top")} className="justify-self-start whitespace-nowrap">
-        mruthunjay
-      </Link>
-      <nav aria-label="Main" className="flex justify-self-center gap-2 sm:gap-5">
-        {LINKS.map((link) => (
-          <Link
-            key={link.id}
-            href={`/#${link.id}`}
-            onClick={go(link.id)}
-            className="header-link py-2"
-            data-active={active === link.id}
-          >
-            <span aria-hidden className="header-link-dot" />
-            {link.label}
-          </Link>
-        ))}
+    <header className={styles.header} data-scrolled={scrolled} data-immersed={immersed && pathname === "/"} inert={immersed && pathname === "/"}>
+      <Link href="/" onClick={go("top")} className={styles.brand} aria-label="Mruthunjay, home">Mruthunjay<span aria-hidden="true">.</span></Link>
+      <nav aria-label="Main navigation" className={styles.links}>
+        {links.map(({ id, label }) => <Link key={id} href={`/#${id}`} onClick={go(id)} aria-current={pathname === "/" && active === id ? "location" : undefined}>{label}</Link>)}
       </nav>
-      <div className="flex items-center gap-2.5 justify-self-end sm:gap-3.5">
-        <span className="hidden opacity-70 [font-variant-numeric:tabular-nums] sm:inline">
-          {clock} ist
-        </span>
-        <button
-          type="button"
-          onClick={toggleTheme}
-          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-          className="nav-toggle-btn flex cursor-pointer items-center gap-1.5 border px-2 py-1.5 sm:px-2.5"
-          style={{ background: "none", color: "inherit", font: "inherit" }}
-        >
-          <span aria-hidden className="inline-block size-1.5 rounded-full" style={{ background: "currentColor" }} />
-          <span className="hidden sm:inline">{theme === "dark" ? "light" : "dark"}</span>
-        </button>
-      </div>
+      <button className={styles.search} type="button" aria-label="Search projects and pages" onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}><span>Search</span><kbd>⌘ K</kbd></button>
     </header>
   );
 }

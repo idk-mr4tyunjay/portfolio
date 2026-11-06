@@ -8,6 +8,7 @@ import { Contact } from "@/components/home/Contact";
 import { Footer } from "@/components/home/Footer";
 import { JsonLd } from "@/components/JsonLd";
 import { SITE } from "@/data/site";
+import { MonitorContent } from "@/components/work/MonitorContent";
 
 export default function Home() {
   return (
@@ -32,8 +33,8 @@ export default function Home() {
         }}
       />
       <Nav />
-      <main>
-        <Hero />
+      <main id="main-content">
+        <Hero destination={<WorkIndex preview />}><MonitorContent /></Hero>
         <WorkIndex />
         <SideProjects />
         <About />
