@@ -25,11 +25,11 @@ The development and production builds share `.next`; do not run them concurrentl
 The opening looks like an illustration, rendered from a small Blender scene with flat materials and contour lines. Scrolling expands the framed scene, follows a low camera around the character, and approaches the monitor. The monitor contains HTML from the real Selected work section. Its final transition adapts to the viewport and continues into the normal document.
 
 - `src/components/home/Hero.tsx`: scroll progress, frame expansion, projected monitor and responsive handoff.
-- `src/components/home/StudioScene.tsx`: Three.js renderer, material shaders and camera interpolation. It draws on changes, not continuously while idle.
+- `src/components/home/StudioScene.tsx`: Three.js renderer, material shaders and camera interpolation. It draws on changes, not continuously while idle. The expanding frame clips and scales a stable render surface, with overscan for short landscape layouts, so scrolling does not reallocate the canvas.
 - `public/studio/`: optimized model, camera samples, fallback poster and asset credits.
 - `src/components/work/MonitorContent.tsx`: the monitor's preview of the real work section.
 
-Reduced-motion users receive the static illustration and normal page flow. WebGL or asset loading failures use the same fallback. The preview copies are inert and hidden from assistive technology; the real content is server-rendered and remains navigable without JavaScript.
+Reduced-motion users receive the static illustration and normal page flow. WebGL or asset loading failures use the same fallback. If motion stops during the entrance, the page continues at Selected work. The poster stays visible until a remounted scene has actually drawn. The preview copies are inert and hidden from assistive technology; the real content is server-rendered and remains navigable without JavaScript.
 
 ## Content and routes
 

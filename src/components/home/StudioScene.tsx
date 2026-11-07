@@ -28,6 +28,10 @@ export type ScreenCorners = [number, number][];
 
 type StudioSceneProps = {
   progress: number;
+  /** Visible crop before the parent scales the full-stage canvas into it. */
+  visibleFrame?: { width: number; height: number };
+  /** Stage orientation, independent of any taller overscan canvas. */
+  portraitFraming?: boolean;
   onReady?: () => void;
   onScreenChange?: (corners: ScreenCorners) => void;
   onError?: () => void;
@@ -124,6 +128,8 @@ function disposeModel(model: Group) {
 /** The scene only draws when progress or its viewport changes. */
 export default function StudioScene({
   progress,
+  visibleFrame,
+  portraitFraming,
   onReady,
   onScreenChange,
   onError,
@@ -131,6 +137,10 @@ export default function StudioScene({
 }: StudioSceneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef(progress);
+  const visibleWidth = visibleFrame?.width;
+  const visibleHeight = visibleFrame?.height;
+  const visibleFrameRef = useRef({ width: visibleWidth, height: visibleHeight });
+  const portraitFramingRef = useRef(portraitFraming);
   const callbacksRef = useRef({ onReady, onScreenChange, onError });
   const invalidateRef = useRef<(() => void) | null>(null);
   const lastCornersRef = useRef<ScreenCorners | null>(null);
@@ -144,8 +154,10 @@ export default function StudioScene({
 
   useEffect(() => {
     progressRef.current = progress;
+    visibleFrameRef.current = { width: visibleWidth, height: visibleHeight };
+    portraitFramingRef.current = portraitFraming;
     invalidateRef.current?.();
-  }, [progress]);
+  }, [progress, visibleWidth, visibleHeight, portraitFraming]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -170,8 +182,9 @@ export default function StudioScene({
 
     const scene = new Scene();
     const camera = new PerspectiveCamera(40, 1, 0.01, 50);
-    const viewport = new Vector2(1, 1);
-    const outlineMaterial = createOutline(viewport);
+    const bufferSize = new Vector2(1, 1);
+    const outlineViewport = new Vector2(1, 1);
+    const outlineMaterial = createOutline(outlineViewport);
     const nextPosition = new Vector3();
     const nextQuaternion = new Quaternion();
     const projected = new Vector3();
@@ -184,17 +197,23 @@ export default function StudioScene({
     let frame = 0;
     let disposed = false;
     let contextLost = false;
+    let sceneLoaded = false;
+    let needsReady = true;
 
     function draw() {
       frame = 0;
-      if (disposed || contextLost || !data || !model) return;
+      if (disposed || contextLost || !sceneLoaded || !data || !model) return;
       const width = container!.clientWidth;
       const height = container!.clientHeight;
-      if (width === 0 || height === 0) return;
-      if (viewport.x !== width || viewport.y !== height) {
-        viewport.set(width, height);
+      const frameWidth = visibleFrameRef.current.width ?? width;
+      const frameHeight = visibleFrameRef.current.height ?? height;
+      if (width <= 0 || height <= 0 || frameWidth <= 0 || frameHeight <= 0) return;
+      if (bufferSize.x !== width || bufferSize.y !== height) {
+        bufferSize.set(width, height);
         renderer.setSize(width, height, false);
       }
+      const scale = frameWidth / width;
+      outlineViewport.set(width * scale, height * scale);
       const progress = Math.max(0, Math.min(1, progressRef.current));
       const cursor = progress * (data.camera.length - 1);
       const index = Math.floor(cursor);
@@ -207,13 +226,16 @@ export default function StudioScene({
       const horizontalFov = start.horizontalFov + (end.horizontalFov - start.horizontalFov) * blend;
       // A portrait opening uses the same low camera with a closer, higher crop.
       // Ease back into the authored framing as the camera reaches the monitor.
-      const narrow = Math.max(0, Math.min(1, (700 - width) / 280));
+      const portrait = portraitFramingRef.current ?? (height > width);
+      const narrow = portrait ? Math.max(0, Math.min(1, (700 - frameWidth) / 280)) : 0;
       const settleProgress = Math.max(0, Math.min(1, (progress - 0.55) / 0.35));
       const settle = 1 - settleProgress * settleProgress * (3 - 2 * settleProgress);
-      const framing = 1 - (1 - Math.min(1, camera.aspect / 1.1)) * narrow * settle;
+      const framing = 1 - (1 - Math.min(1, frameWidth / frameHeight / 1.1)) * narrow * settle;
       camera.fov = (2 * Math.atan(Math.tan(horizontalFov / 2) * framing / camera.aspect) * 180) / Math.PI;
       if (narrow > 0 && settle > 0) {
-        camera.setViewOffset(width, height, 0, height * 0.18 * narrow * settle, width, height);
+        // The parent centers and scales this canvas inside the visible crop.
+        // Undo that scale for the old crop-relative vertical camera offset.
+        camera.setViewOffset(width, height, 0, (frameHeight / scale) * 0.18 * narrow * settle, width, height);
       } else {
         camera.clearViewOffset();
       }
@@ -225,15 +247,18 @@ export default function StudioScene({
       for (const point of screenWorld) {
         projected.copy(point).applyMatrix4(camera.matrixWorldInverse);
         if (projected.z >= -camera.near) {
-          lastCornersRef.current = [];
-          callbacksRef.current.onScreenChange?.([]);
-          return;
+          corners.length = 0;
+          break;
         }
         projected.copy(point).project(camera);
         corners.push([(projected.x + 1) / 2, (1 - projected.y) / 2]);
       }
       lastCornersRef.current = corners;
       callbacksRef.current.onScreenChange?.(corners);
+      if (needsReady) {
+        needsReady = false;
+        callbacksRef.current.onReady?.();
+      }
     }
 
     function invalidate() {
@@ -250,8 +275,8 @@ export default function StudioScene({
     };
     const onContextRestored = () => {
       contextLost = false;
+      needsReady = true;
       invalidate();
-      callbacksRef.current.onReady?.();
     };
     renderer.domElement.addEventListener("webglcontextlost", onContextLost);
     renderer.domElement.addEventListener("webglcontextrestored", onContextRestored);
@@ -330,8 +355,8 @@ export default function StudioScene({
         });
         model.add(...outlines);
         scene.add(model);
+        sceneLoaded = true;
         draw();
-        callbacksRef.current.onReady?.();
       } catch (error) {
         if (!disposed && !(error instanceof DOMException && error.name === "AbortError")) {
           callbacksRef.current.onError?.();

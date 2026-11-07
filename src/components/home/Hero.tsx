@@ -33,18 +33,31 @@ export function Hero({ children, destination }: { children: ReactNode; destinati
   const journey = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLDivElement>(null);
+  const sceneContent = useRef<HTMLDivElement>(null);
+  const posterFrame = useRef<HTMLDivElement>(null);
+  const sceneReady = useRef(false);
+  const fallbackToWork = useRef(false);
   const intro = useRef<HTMLDivElement>(null);
   const cue = useRef<HTMLDivElement>(null);
   const screen = useRef<HTMLDivElement>(null);
   const handoff = useRef<HTMLDivElement>(null);
   const progress = useRef(0);
   const lastCorners = useRef<ScreenCorners>([]);
+  const projection = useRef({ width: 1, height: 1, renderHeight: 1, scale: 1, x: 0, y: 0 });
   const [motion, setMotion] = useState(false);
   const [preferenceKnown, setPreferenceKnown] = useState(false);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [camera, setCamera] = useState(0);
+  const [visibleFrame, setVisibleFrame] = useState<{ width: number; height: number; portrait: boolean }>();
   const animated = motion && !failed;
+  const handleReady = useCallback(() => { sceneReady.current = true; setReady(true); }, []);
+  const handleError = useCallback(() => {
+    fallbackToWork.current = progress.current > 0 && progress.current < 1;
+    sceneReady.current = false;
+    setReady(false);
+    setFailed(true);
+  }, []);
 
   const placeHandoff = useCallback(() => {
     const surface = handoff.current;
@@ -63,6 +76,11 @@ export function Hero({ children, destination }: { children: ReactNode; destinati
   useEffect(() => {
     const preference = matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => {
+      if (preference.matches) {
+        fallbackToWork.current = progress.current > 0 && progress.current < 1;
+        sceneReady.current = false;
+        setReady(false);
+      }
       setMotion(!preference.matches);
       setPreferenceKnown(true);
     };
@@ -104,16 +122,34 @@ export function Hero({ children, destination }: { children: ReactNode; destinati
       progress.current = p;
       const grow = clamp(p / 0.23);
       const mobile = width < 700;
+      const compact = width >= 500 && height < 560;
       const gutter = mobile ? 20 : Math.max(24, Math.min(80, width * 0.05));
-      const top = mobile
+      const top = compact ? 90 : mobile
         ? Math.max(Math.min(300, height * 0.40), (intro.current?.offsetTop ?? 112) + (intro.current?.offsetHeight ?? 160) + 32)
         : Math.min(340, Math.max(270, height * 0.36));
-      const bottom = mobile ? 58 : 48;
-      panel!.style.left = `${gutter * (1 - grow)}px`;
-      panel!.style.top = `${top * (1 - grow)}px`;
-      panel!.style.width = `${width - 2 * gutter * (1 - grow)}px`;
-      panel!.style.height = `${height - (top + bottom) * (1 - grow)}px`;
-      panel!.style.borderRadius = `${16 * (1 - grow)}px`;
+      const bottom = compact ? 44 : mobile ? 58 : 48;
+      const openingLeft = compact ? width * 0.49 : gutter;
+      const leftInset = openingLeft * (1 - grow);
+      const rightInset = gutter * (1 - grow);
+      const topInset = top * (1 - grow);
+      const bottomInset = bottom * (1 - grow);
+      const cropWidth = width - leftInset - rightInset;
+      const cropHeight = height - topInset - bottomInset;
+      const scale = cropWidth / width;
+      // A tall opening crop needs overscan on short landscape screens. Reserve
+      // it once per viewport so the canvas still never resizes during scroll.
+      const renderHeight = Math.max(height, Math.ceil((height - top - bottom) * width / (width - openingLeft - gutter)));
+      const contentY = topInset + (cropHeight - renderHeight * scale) / 2;
+      projection.current = { width, height, renderHeight, scale, x: leftInset, y: contentY };
+      panel!.style.clipPath = `inset(${topInset}px ${rightInset}px ${bottomInset}px ${leftInset}px round ${16 * (1 - grow)}px)`;
+      if (sceneContent.current) {
+        if (sceneContent.current.style.height !== `${renderHeight}px`) sceneContent.current.style.height = `${renderHeight}px`;
+        sceneContent.current.style.transform = `translate3d(${leftInset}px,${contentY}px,0) scale(${scale})`;
+      }
+      if (!sceneReady.current && posterFrame.current) {
+        Object.assign(posterFrame.current.style, { left: `${leftInset}px`, top: `${topInset}px`, width: `${cropWidth}px`, height: `${cropHeight}px` });
+      }
+      setVisibleFrame((previous) => previous?.width === cropWidth && previous.height === cropHeight && previous.portrait === (height > width) ? previous : { width: cropWidth, height: cropHeight, portrait: height > width });
       if (intro.current) {
         intro.current.style.opacity = String(1 - clamp(grow * 1.7));
         intro.current.style.transform = `translate3d(0,${-grow * 90}px,0)`;
@@ -154,13 +190,28 @@ export function Hero({ children, destination }: { children: ReactNode; destinati
     };
   }, [animated, placeHandoff]);
 
+  useEffect(() => {
+    if (animated || !fallbackToWork.current) return;
+    fallbackToWork.current = false;
+    // If motion stops mid-journey, continue at the work instead of landing
+    // partway down a project after the long scroll region collapses.
+    const raf = requestAnimationFrame(() => {
+      const target = document.getElementById("index");
+      if (!target) return;
+      if (window.__lenis) window.__lenis.scrollTo(target, { immediate: true });
+      else window.scrollTo({ top: window.scrollY + target.getBoundingClientRect().top, behavior: "instant" });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [animated]);
+
   const placeScreen = useCallback((corners: ScreenCorners) => {
-    lastCorners.current = corners;
+    const { width, height, renderHeight, scale, x, y } = projection.current;
+    lastCorners.current = corners.map(([cx, cy]) => [(cx * width * scale + x) / width, (cy * renderHeight * scale + y) / height]);
     placeHandoff();
     const plane = screen.current, panel = frame.current;
     if (!plane || !panel) return;
     if (corners.length !== 4) { plane.style.visibility = "hidden"; return; }
-    const transform = screenTransform(corners, panel.clientWidth, panel.clientHeight);
+    const transform = screenTransform(corners, width, renderHeight);
     plane.style.visibility = transform ? "visible" : "hidden";
     if (transform) plane.style.transform = transform;
   }, [placeHandoff]);
@@ -184,9 +235,13 @@ export function Hero({ children, destination }: { children: ReactNode; destinati
           </div>
         </div>
         <div ref={frame} className={styles.frame} aria-label="An illustrated developer at a minimal workstation">
-          <Image src="/studio/poster.png" alt="An anonymous illustrated developer at a desk, with this portfolio on the monitor." fill priority sizes="100vw" className={styles.poster} style={{ opacity: ready && animated ? 0 : 1 }} />
-          {animated && <StudioScene progress={camera} onReady={() => setReady(true)} onError={() => setFailed(true)} onScreenChange={placeScreen} className={styles.scene} />}
-          {animated && ready && <div ref={screen} className={styles.monitorPlane} aria-hidden="true" inert>{children}</div>}
+          <div ref={posterFrame} className={styles.posterFrame} style={{ opacity: ready && animated ? 0 : 1 }}>
+            <Image src="/studio/poster.png" alt="An anonymous illustrated developer at a desk, with this portfolio on the monitor." fill priority sizes="100vw" className={styles.poster} />
+          </div>
+          <div ref={sceneContent} className={styles.sceneContent}>
+            {animated && <StudioScene progress={camera} visibleFrame={visibleFrame} portraitFraming={visibleFrame?.portrait} onReady={handleReady} onError={handleError} onScreenChange={placeScreen} className={styles.scene} />}
+            {animated && <div ref={screen} className={styles.monitorPlane} style={{ opacity: ready ? 1 : 0 }} aria-hidden="true" inert>{children}</div>}
+          </div>
           {animated && <div ref={handoff} className={styles.handoff} aria-hidden="true" inert>{destination}</div>}
         </div>
         <div ref={cue} className={styles.cue}>
